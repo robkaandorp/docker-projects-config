@@ -1,0 +1,122 @@
+version: 1.0
+repositories:
+workers:
+  coder:
+    model: ollama-cloud/deepseek-v4-flash:0731
+    premium_model: copilot/claude-opus-5
+    reasoning_effort: high
+    premium_reasoning_effort: high
+  reviewer:
+    model: copilot/gpt-5.6-sol
+    premium_model: ''
+    reasoning_effort: high
+    premium_reasoning_effort: none
+  tester:
+    model: ollama-cloud/glm-5.2
+    premium_model: copilot/gpt-5.6-sol
+    reasoning_effort: high
+    premium_reasoning_effort: high
+  improver:
+    model: copilot/gpt-5.6-terra
+    premium_model: ''
+    reasoning_effort: high
+    premium_reasoning_effort: none
+  docwriter:
+    model: copilot/gpt-5.6-luna
+    premium_model: ''
+    reasoning_effort: none
+    premium_reasoning_effort: none
+orchestrator:
+  model: ollama-cloud/deepseek-v4-pro:0813
+  max_iterations: 5
+  max_retries_per_task: 5
+  max_parallel_goals: 3
+  verbose_logging: true
+  brain_max_steps: 50
+  branch_cleanup_delay_hours: 48
+  worker_task_timeout_minutes: 60
+  reasoning_effort: high
+models:
+  compaction_model: copilot/gpt-5.6-luna
+  available_models:
+  - name: ollama-cloud/glm-5.2
+    context_window: 976000
+    reasoning_effort: high
+    supports_vision: false
+  - name: ollama-cloud/kimi-k2.6
+    context_window: 256000
+    reasoning_effort: high
+    supports_vision: true
+  - name: ollama-cloud/kimi-k2.7-code
+    context_window: 256000
+    reasoning_effort: high
+    supports_vision: true
+  - name: copilot/claude-fable-5
+    context_window: 264000
+    reasoning_effort: high
+    supports_vision: true
+  - name: copilot/claude-sonnet-5
+    context_window: 264000
+    reasoning_effort: high
+    supports_vision: true
+  - name: copilot/gpt-5.6-luna
+    context_window: 328000
+    supports_vision: true
+  - name: copilot/gpt-5.6-sol
+    context_window: 400000
+    reasoning_effort: high
+    supports_vision: true
+  - name: copilot/gpt-5.6-terra
+    context_window: 400000
+    reasoning_effort: high
+    supports_vision: true
+  - name: copilot/claude-opus-5
+    context_window: 264000
+    reasoning_effort: high
+    supports_vision: true
+  - name: ollama-cloud/kimi-k3
+    context_window: 1000000
+    reasoning_effort: high
+    supports_vision: true
+  - name: ollama-cloud/deepseek-v4-flash:0731
+    context_window: 1000000
+    reasoning_effort: high
+    supports_vision: false
+  - name: ollama-cloud/deepseek-v4-pro:0813
+    context_window: 1000000
+    supports_vision: false
+  - name: copilot/gemini-3.7-flash
+    context_window: 264000
+    supports_vision: true
+  - name: copilot/grok-4.6
+    context_window: 328000
+    supports_vision: true
+  sub_agent_models:
+  - name: copilot/gpt-5.6-luna
+    reasoning_effort: none
+    description: Fast and cheap, good for simple lookups and summarization tasks. Non-thinking.
+  - name: copilot/gpt-5.6-sol
+    reasoning_effort: high
+    description: Heavy and expensive model. Excellent for deep reviews.
+  - name: ollama-cloud/kimi-k2.7-code
+    reasoning_effort: high
+    description: Default coding model. Good trade-off between cost and speed. This vision capable model supports images only, not PDF.
+  - name: copilot/claude-opus-5
+    reasoning_effort: high
+    description: The senior architect. Deepest reasoning of the catalog — gets things right where other models get them wrong, especially architecture and complex coding. Slower and expensive as a result. Use for hard design/correctness problems, not for bulk work.
+  - name: ollama-cloud/kimi-k3
+    reasoning_effort: high
+    description: Heavy and expensive. Alternative to Claude Opus 5 with a much larger context window.
+  - name: ollama-cloud/glm-5.2
+    reasoning_effort: high
+    description: Excellent all-round model for analysis, orchestration and coding at moderate cost. Good trade-off between quality, speed and cost.
+  - name: copilot/gpt-5.6-terra
+    reasoning_effort: high
+    description: Basic all-round model. Supports vision; images and PDF.
+  - name: copilot/gemini-3.7-flash
+    reasoning_effort: high
+    description: Fast and cheap, but still very capable. Supports all modalities; text, image, speech and video.
+composer:
+  model: ollama-cloud/glm-5.2
+  max_steps: 100
+  reasoning_effort: high
