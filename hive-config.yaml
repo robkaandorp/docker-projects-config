@@ -97,7 +97,6 @@ models:
     supports_vision: true
   - name: ollama-cloud/glm-5.3
   - name: ollama-cloud/glm-5.3-flash
-  - name: ollama-cloud/minimax-m3
   sub_agent_models:
   - name: copilot/gpt-5.6-luna
     reasoning_effort: none
