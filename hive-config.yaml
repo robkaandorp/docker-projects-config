@@ -104,6 +104,8 @@ models:
     context_window: 265536
   - name: copilot/gpt-6-luna
     context_window: 400000
+  - name: copilot/gpt-6-sol
+    context_window: 400000
   sub_agent_models:
   - name: copilot/gpt-5.6-luna
     reasoning_effort: none
