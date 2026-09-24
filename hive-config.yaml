@@ -66,9 +66,6 @@ models:
     context_window: 1000000
     reasoning_effort: high
     supports_vision: true
-  - name: copilot/gemini-3.7-flash
-    context_window: 264000
-    supports_vision: true
   - name: ollama-cloud/glm-5.3
     context_window: 1048576
     supports_vision: false
