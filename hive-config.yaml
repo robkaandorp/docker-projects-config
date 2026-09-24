@@ -91,9 +91,6 @@ models:
     context_window: 400000
     supports_vision: true
   sub_agent_models:
-  - name: copilot/claude-opus-5
-    reasoning_effort: high
-    description: The senior architect. Deepest reasoning of the catalog — gets things right where other models get them wrong, especially architecture and complex coding. Slower and expensive as a result. Use for hard design/correctness problems, not for bulk work.
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
     description: Heavy and expensive. Alternative to Claude Opus 5 with a much larger context window.
