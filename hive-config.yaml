@@ -66,10 +66,6 @@ models:
     context_window: 1000000
     reasoning_effort: high
     supports_vision: true
-  - name: ollama-cloud/deepseek-v4-flash:0731
-    context_window: 1000000
-    reasoning_effort: high
-    supports_vision: false
   - name: ollama-cloud/deepseek-v4-pro:0813
     context_window: 1000000
     supports_vision: false
