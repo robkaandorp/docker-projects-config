@@ -115,6 +115,9 @@ models:
   - name: copilot/gemini-3.7-flash
     reasoning_effort: high
     description: Fast and cheap, but still very capable. Supports all modalities; text, image, speech and video.
+  - name: copilot/gpt-6-luna
+    reasoning_effort: none
+    description: Fast and cheap, good for simple lookups and summarization tasks. Non-thinking.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
