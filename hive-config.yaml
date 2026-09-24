@@ -94,9 +94,6 @@ models:
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
     description: Heavy and expensive. Alternative to Claude Opus 5.5 with a much larger context window.
-  - name: ollama-cloud/glm-5.2
-    reasoning_effort: high
-    description: Excellent all-round model for analysis, orchestration and coding at moderate cost. Good trade-off between quality, speed and cost.
   - name: copilot/gpt-5.6-terra
     reasoning_effort: high
     description: Basic all-round model. Supports vision; images and PDF.
