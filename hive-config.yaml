@@ -4,6 +4,11 @@ repositories:
   url: https://github.com/robkaandorp/docker-volume-rbd.git
   default_branch: master
   ci_timeout_minutes: 30
+- name: docker-volume-nfs
+  url: https://github.com/robkaandorp/docker-volume-rbd.git
+  default_branch: master
+  monitor_ci: true
+  ci_timeout_minutes: 30
 workers:
   coder:
     model: ollama-cloud/deepseek-v4.1-flash
