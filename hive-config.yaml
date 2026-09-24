@@ -97,9 +97,6 @@ models:
   - name: copilot/gpt-5.6-terra
     reasoning_effort: high
     description: Basic all-round model. Supports vision; images and PDF.
-  - name: copilot/gemini-3.7-flash
-    reasoning_effort: high
-    description: Fast and cheap, but still very capable. Supports all modalities; text, image, speech and video.
   - name: copilot/gpt-6-luna
     reasoning_effort: none
     description: Fast and cheap, good for simple lookups and summarization tasks. Non-thinking.
