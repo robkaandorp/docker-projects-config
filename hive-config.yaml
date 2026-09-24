@@ -115,6 +115,9 @@ models:
   - name: ollama-cloud/glm-5.3-flash
     reasoning_effort: extra_high
     description: Excellent all-round model for analysis, orchestration and coding at low cost. Good trade-off between quality, speed and cost. This vision capable model supports images only, not PDF.
+  - name: copilot/gemini-3.8-flash
+    reasoning_effort: high
+    description: Fast and cheap, but still very capable. Supports all modalities; text, image, speech and video.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
