@@ -109,6 +109,7 @@ models:
     supports_vision: true
   - name: copilot/gpt-6-luna
     context_window: 400000
+    supports_vision: true
   - name: copilot/gpt-6-sol
     context_window: 400000
   sub_agent_models:
