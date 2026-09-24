@@ -115,6 +115,9 @@ models:
   - name: copilot/gpt-6-sol
     reasoning_effort: high
     description: Heavy and expensive model. Excellent for deep reviews.
+  - name: ollama-cloud/deepseek-v4.1-flash
+    reasoning_effort: extra_high
+    description: Default coding model. Good trade-off between cost and speed. This vision capable model supports images only, not PDF.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
