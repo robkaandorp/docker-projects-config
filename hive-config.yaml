@@ -43,10 +43,6 @@ orchestrator:
 models:
   compaction_model: copilot/gpt-6-luna
   available_models:
-  - name: ollama-cloud/kimi-k2.6
-    context_window: 256000
-    reasoning_effort: high
-    supports_vision: true
   - name: ollama-cloud/kimi-k2.7-code
     context_window: 256000
     reasoning_effort: high
