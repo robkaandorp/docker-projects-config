@@ -115,6 +115,9 @@ models:
   - name: copilot/gpt-6-luna
     reasoning_effort: none
     description: Fast and cheap, good for simple lookups and summarization tasks. Non-thinking.
+  - name: copilot/gpt-6-sol
+    reasoning_effort: high
+    description: Heavy and expensive model. Excellent for deep reviews.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
