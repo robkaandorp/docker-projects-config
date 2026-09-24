@@ -115,6 +115,9 @@ models:
   - name: ollama-cloud/deepseek-v4.1-flash
     reasoning_effort: extra_high
     description: Default coding model. Good trade-off between cost and speed. This vision capable model supports images only, not PDF.
+  - name: copilot/claude-opus-5.5
+    reasoning_effort: high
+    description: The senior architect. Deepest reasoning of the catalog — gets things right where other models get them wrong, especially architecture and complex coding. Slower and expensive as a result. Use for hard design/correctness problems, not for bulk work.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
