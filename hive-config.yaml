@@ -43,10 +43,6 @@ orchestrator:
 models:
   compaction_model: copilot/gpt-6-luna
   available_models:
-  - name: copilot/claude-fable-5
-    context_window: 264000
-    reasoning_effort: high
-    supports_vision: true
   - name: copilot/claude-sonnet-5
     context_window: 264000
     reasoning_effort: high
