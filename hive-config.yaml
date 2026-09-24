@@ -91,9 +91,6 @@ models:
     context_window: 400000
     supports_vision: true
   sub_agent_models:
-  - name: ollama-cloud/kimi-k2.7-code
-    reasoning_effort: high
-    description: Default coding model. Good trade-off between cost and speed. This vision capable model supports images only, not PDF.
   - name: copilot/claude-opus-5
     reasoning_effort: high
     description: The senior architect. Deepest reasoning of the catalog — gets things right where other models get them wrong, especially architecture and complex coding. Slower and expensive as a result. Use for hard design/correctness problems, not for bulk work.
