@@ -98,6 +98,7 @@ models:
   - name: ollama-cloud/glm-5.3
     supports_vision: false
   - name: ollama-cloud/glm-5.3-flash
+    supports_vision: true
   - name: copilot/claude-opus-5.5
     context_window: 328000
   - name: ollama-cloud/deepseek-v4.1-flash
