@@ -103,6 +103,7 @@ models:
     context_window: 328000
     supports_vision: true
   - name: ollama-cloud/deepseek-v4.1-flash
+    supports_vision: true
   - name: copilot/gemini-3.8-flash
     context_window: 265536
   - name: copilot/gpt-6-luna
