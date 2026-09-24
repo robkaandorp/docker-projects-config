@@ -5,11 +5,6 @@ repositories:
   default_branch: master
   monitor_ci: true
   ci_timeout_minutes: 30
-- name: docker-volume-nfs
-  url: https://github.com/robkaandorp/docker-volume-nfs.git
-  default_branch: master
-  monitor_ci: true
-  ci_timeout_minutes: 30
 - name: drone-portainer
   url: https://github.com/robkaandorp/drone-portainer.git
   default_branch: master
