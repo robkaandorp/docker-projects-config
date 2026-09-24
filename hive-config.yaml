@@ -6,32 +6,32 @@ repositories:
   ci_timeout_minutes: 30
 workers:
   coder:
-    model: ollama-cloud/deepseek-v4-flash:0731
-    premium_model: copilot/claude-opus-5
-    reasoning_effort: high
+    model: ollama-cloud/deepseek-v4.1-flash
+    premium_model: copilot/claude-opus-5.5
+    reasoning_effort: extra_high
     premium_reasoning_effort: high
   reviewer:
-    model: copilot/gpt-5.6-sol
+    model: copilot/gpt-6-sol
     premium_model: ''
     reasoning_effort: high
     premium_reasoning_effort: none
   tester:
-    model: ollama-cloud/glm-5.2
-    premium_model: copilot/gpt-5.6-sol
-    reasoning_effort: high
+    model: ollama-cloud/glm-5.3-flash
+    premium_model: copilot/gpt-6-sol
+    reasoning_effort: extra_high
     premium_reasoning_effort: high
   improver:
-    model: copilot/gpt-5.6-terra
+    model: copilot/gpt-6-luna
     premium_model: ''
     reasoning_effort: high
     premium_reasoning_effort: none
   docwriter:
-    model: copilot/gpt-5.6-luna
+    model: copilot/gpt-6-luna
     premium_model: ''
     reasoning_effort: none
     premium_reasoning_effort: none
 orchestrator:
-  model: ollama-cloud/deepseek-v4-pro:0813
+  model: ollama-cloud/glm-5.3-flash
   max_iterations: 5
   max_retries_per_task: 5
   max_parallel_goals: 3
@@ -39,9 +39,9 @@ orchestrator:
   brain_max_steps: 50
   branch_cleanup_delay_hours: 48
   worker_task_timeout_minutes: 60
-  reasoning_effort: high
+  reasoning_effort: extra_high
 models:
-  compaction_model: copilot/gpt-5.6-luna
+  compaction_model: copilot/gpt-6-luna
   available_models:
   - name: ollama-cloud/glm-5.2
     context_window: 976000
@@ -139,6 +139,6 @@ models:
     reasoning_effort: high
     description: Fast and cheap, but still very capable. Supports all modalities; text, image, speech and video.
 composer:
-  model: ollama-cloud/glm-5.2
+  model: copilot/claude-opus-5.5
   max_steps: 100
   reasoning_effort: high
