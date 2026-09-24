@@ -106,6 +106,7 @@ models:
     supports_vision: true
   - name: copilot/gemini-3.8-flash
     context_window: 265536
+    supports_vision: true
   - name: copilot/gpt-6-luna
     context_window: 400000
   - name: copilot/gpt-6-sol
