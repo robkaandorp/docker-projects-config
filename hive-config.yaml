@@ -96,6 +96,7 @@ models:
     context_window: 328000
     supports_vision: true
   - name: ollama-cloud/glm-5.3
+    context_window: 1048576
     supports_vision: false
   - name: ollama-cloud/glm-5.3-flash
     supports_vision: true
