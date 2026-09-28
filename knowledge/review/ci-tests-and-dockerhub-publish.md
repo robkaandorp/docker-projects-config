@@ -15,23 +15,22 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The prerequisite has not landed in the inspected repository: package.json has no test script and src/*.test.ts does not exist. Make the dependency on restructure-for-testability-and-add-tests enforceable in dispatch, and do not start this goal until it lands.
+### [MAJOR] The workflow will have `contents: write`, but `actions/checkout` persists its token by default. The Dockerfile's `COPY . .` can copy checkout credentials from `.git` into the image, which is then exported and published as a plugin. Require `persist-credentials: false` on checkout, or another explicit protection that keeps the token out of the build context.
 
-### [MAJOR] The already-released guard needs authenticated GitHub CLI access before Docker Hub publishing. Specify GH_TOKEN for the guard and require it to distinguish a missing release from authentication or API failures; otherwise a failed lookup could be mistaken for an unreleased version.
+### [MINOR] “Tgz as a local job artifact” is ambiguous. The specified steps create a tgz on the runner but do not upload a downloadable GitHub Actions artifact. Clarify which is intended.
 
-### [MINOR] “Develop and PR builds only build and test” conflicts literally with the requirement to export the image and create a tgz on every trigger. Clarify that these builds may package artifacts but must not publish them.
+### [MINOR] The release guard checks for an existing release, not an existing git tag. If the full-version tag already exists at another commit, `gh release create --target` will not retarget it. Specify whether the job should verify or reject an existing tag to guarantee that the release tag points to the built master commit.
 
 ## Verified
 - ✅ docker-volume-rbd/.github/workflows/docker-image.yml exists
-- ✅ docker-volume-rbd/Dockerfile builder stage and pnpm build/prune steps exists
+- ✅ docker-volume-rbd/Dockerfile builder stage exists
 - ✅ docker-volume-rbd/build.sh exists
 - ✅ docker-volume-rbd/README.md exists
-- ✅ docker-volume-rbd/package.json exists
-- ❌ package.json test script does not exist
-- ❌ docker-volume-rbd/src/*.test.ts does not exist
-- ❌ docker-volume-rbd/VERSION does not exist
-- ✅ docker-volume-rbd/config.json, entrypoint.sh, tsconfig.json, pnpm-lock.yaml exists
+- ✅ docker-volume-rbd/package.json test script exists
+- ✅ docker-volume-rbd/src/*.test.ts exists
+- ❌ docker-volume-rbd/VERSION (proposed new file) does not exist
+- ✅ docker-volume-rbd/config.json exists
 - ✅ docker-volume-rbd/.github/copilot-instructions.md exists
 
 ## Recommendation
-Enforce the stated prerequisite before dispatch. Specify fail-closed, authenticated release checking and clarify that non-master builds package but never publish. The remaining scope is feasible as one goal.
+The prerequisite test script and test files are present, and the work is otherwise appropriately sized. Add a checkout credential-safety requirement, clarify whether the tgz must be uploaded as an Actions artifact, and define handling for a pre-existing full-version git tag.
