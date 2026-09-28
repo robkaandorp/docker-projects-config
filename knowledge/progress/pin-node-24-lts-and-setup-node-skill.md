@@ -141,3 +141,7 @@ I verified the iteration-2 whitespace-trim fix in install-node.sh by cloning the
 ### reviewer (narrative)
 
 I read the full goal, inspected the full merge-base diff and the direct fix commit, and checked file modes, version bytes, Dockerfile expansion, and lockfile structure. The iteration-only diff was empty because HEAD is the fix commit, so comparing it with its parent showed the precise four-insertion/two-deletion validation change. The edge-only trim resolves the prior internally spaced version bug without modifying installation behavior, and the tester's 14 passing checks substantiate the clean-state run and build.
+
+### improver (narrative)
+
+I compared the existing role guidance before editing, which showed that general setup-skill handling and orchestrator reporting existed but the coder-specific report retry, fixture-byte validation, and boundary-only input normalization lessons were missing. I appended concise rules only to coder and tester guidance, preserving unrelated files and avoiding duplicate orchestration guidance. Re-reading confirmed the new examples and checks are intact and all files are far below the character limit; no source changes or tests were needed for this guidance-only update.
