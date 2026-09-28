@@ -31,3 +31,7 @@ I read the requested implementation, test, packaging, and workflow files before 
 ### tester (narrative)
 
 Verified a documentation-only change to .github/copilot-instructions.md. The diff against the merge base confirmed no source, test, or config files changed. Node was missing, so I bootstrapped it with the repository's setup-node skill (Node v24.21.0, pnpm 12.4.2 via Corepack), ran pnpm install --frozen-lockfile, pnpm run build (tsc, exit 0), and the full pnpm test suite (node:test): 108 tests, 108 passed, 0 failed, exit code 0. No fixes were made and nothing was committed, per the verification-only instructions.
+
+### reviewer (narrative)
+
+I compared the replacement guidance with the prior file and verified its claims against implementation, test files, packaging configuration, setup skill and CI. The untracked-volume and rollback descriptions align with the application's distinct tracked and untracked paths, and the endpoint exceptions are stated accurately. Only the intended instructions file changed, and the tester report confirms a successful build and all 108 tests passing.
