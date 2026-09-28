@@ -11,16 +11,18 @@ updated: 2026-09-28
 
 # Review: update-copilot-instructions
 
-## Verdict: NeedsChanges
+## Verdict: Approved
 
 ## Issues
 
-### [MAJOR] The claim that a conflicting device at the mountpoint always causes Mount or Unmount to return an Err and change nothing is too broad. In src/app.ts, that check applies when the volume is untracked. A tracked Mount reuses its table entry without checking the mounted device, and a tracked Unmount does not perform that conflict check. Limit the instruction to untracked-volume paths.
+No issues found.
 
 ## Verified
-- ✅ .github/copilot-instructions.md and all requested source, test, build, configuration, skill, and workflow files exists
+- ✅ .github/copilot-instructions.md; src/server.ts, config.ts, app.ts, rbd.ts, mountPointEntry.ts, and *.test.ts exists
+- ✅ tsconfig.json, package.json, Dockerfile, .dockerignore, .node-version, VERSION, build.sh, config.json exists
+- ✅ .github/skills/setup-node/ and .github/workflows/docker-image.yml exists
 - ✅ parseConfig, Rbd, createApp, RbdInterface, createVolumeLock, withVolumeLock, cleanupBestEffort, CommandRunner, FileSystem, getMountedDevice, MountPointEntry exists
-- ✅ Node pin, build and test scripts, TypeScript settings, Docker stages, VERSION, and CI build/publish jobs exists
+- ✅ Untracked-volume behavior, rollback, locking, endpoint response shapes, and command timeouts described in the goal exists
 
 ## Recommendation
-Clarify that conflict detection and refusal to change anything describe untracked Mount and Unmount requests. The remaining documentation-only scope is feasible in one iteration.
+Proceed with the documentation-only replacement. The referenced files and code behavior match the goal; keep the resulting instructions concise and grounded in the current files.
