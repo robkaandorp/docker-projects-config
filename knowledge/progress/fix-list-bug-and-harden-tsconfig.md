@@ -47,3 +47,11 @@ Commit with git add -A && git commit. IMPORTANT: you MUST call your mandatory ph
 ### coder (narrative)
 
 There was no earlier work on the branch, so I built all five parts from scratch. The environment had no Node or pnpm, so I downloaded Node 22 LTS into /tmp and used corepack to get the pinned pnpm 12.4.2. I then regenerated the lockfile with `pnpm add -D @types/node@^22.20.4`, and it kept its two-document structure. The strict build with no DOM lib compiled cleanly with the typed showmapped entries. I checked that rbd command lines are unchanged by stubbing execFile against the compiled dist and printing every rbd command with both options unset, cluster only, user only, and both set. The project has no skill files, so I followed the build commands in copilot-instructions.
+
+### docwriter (narrative)
+
+I read the complete README first and updated only the requested options-list entries for cluster and keyring user. The targeted re-read confirms the unset defaults, Ceph CLI fallback defaults, and keyring-path example are present, with neighboring option documentation unchanged. I did not run a build because the documentation-only role forbids builds and tests; instead I verified the edited section directly.
+
+### docwriter (narrative)
+
+After confirming README.md was the only modified file, I staged all changes and committed the documentation update as 4befce0. The commit contains only README.md, and the final git status reports a clean working tree. No push was performed.
