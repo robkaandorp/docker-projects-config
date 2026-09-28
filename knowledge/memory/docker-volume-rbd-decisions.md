@@ -30,3 +30,15 @@ Things the owner (Rob Kaandorp) decided, to keep in mind when planning goals for
 
 ## Testing
 - Use Node's built-in test runner (`node --test`), with no extra test framework. Restructure for testability: an injectable command runner in `Rbd`, and a `createApp()` factory split from the socket `listen` entry point.
+
+
+
+## Versioning (decided 2026-09-28)
+- A `VERSION` file at the repo root holds `v<ceph major>.<minor>-r<revision>`, e.g. `v20.2-r1`.
+- Each master release publishes Docker Hub tags `robkaandorp/rbd:v20.2` (moving tag, the one users install) and `robkaandorp/rbd:v20.2-r1` (immutable), plus a GitHub release `v20.2-r1`.
+- Bump the revision on develop before each release merge. CI fails on master if that version was already released.
+- CopilotHive release IDs/tags follow the same scheme (first release: `v20.2-r1`). The owner turned off CopilotHive's automatic tagging on merge to master, because CI does the tagging.
+- This replaces the old `vars.VERSION_TAG` + `github.run_number` scheme (the last old release was v20.2.26).
+
+## Restart handling (decided 2026-09-28)
+- No startup recovery of the mount table. Untracked volumes are handled when Docker asks about them: Unmount of an untracked volume unmounts and unmaps it if its own device is mounted; Mount adopts an existing mount of the same device. A conflicting device at the mountpoint returns an Err and nothing is changed.
