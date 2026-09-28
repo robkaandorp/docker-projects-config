@@ -1,0 +1,39 @@
+{
+  "iteration": 1,
+  "timestamp": "2026-09-28T20:54:06.9083343Z",
+  "duration": "00:06:44.7721638",
+  "buildSuccess": true,
+  "totalTests": 71,
+  "passedTests": 71,
+  "failedTests": 0,
+  "coveragePercent": 0,
+  "integrationTestsTotal": 0,
+  "integrationTestsPassed": 0,
+  "runtimeVerified": false,
+  "verdict": "Pass",
+  "testReportSummary": "",
+  "issues": [
+    "Skipped (unavailable): docker build not available in this environment, so the image-level check that the builder stage runs pnpm test and that the image contains no /app/.git could not be exercised; verified statically instead (Dockerfile ordering \u002B .dockerignore entries).",
+    "Not verifiable locally: actual GitHub Actions execution, the Docker Hub publish, and the already-released guard against the live GitHub API \u2014 the owner will check the first master run."
+  ],
+  "reviewIssuesFound": 0,
+  "reviewIssues": [],
+  "reviewVerdict": "Approve",
+  "retryCount": 0,
+  "reviewRetryCount": 0,
+  "testRetryCount": 0,
+  "phaseDurations": {},
+  "promptTokens": 0,
+  "completionTokens": 0,
+  "agentsMdVersions": {
+    "coder": "v002",
+    "tester": "v003",
+    "reviewer": "v000",
+    "improver": "v000",
+    "orchestrator": "v000",
+    "docwriter": "v000"
+  },
+  "custom": {},
+  "improverSkipped": false,
+  "improverSkipReason": null
+}
