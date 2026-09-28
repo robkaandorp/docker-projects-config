@@ -15,16 +15,12 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The untracked-volume instructions say Unmount performs a best-effort unmount and unmap and returns success. In src/app.ts, a failed unmount prevents unmap, and any cleanup error returns a nonempty Err. Specify that it returns success only when the attempted cleanup succeeds; distinguish this from best-effort rollback.
-
-### [MINOR] The workflow does not run on every push or pull request. .github/workflows/docker-image.yml limits both triggers to master and develop. Qualify the CI description accordingly.
+### [MAJOR] The claim that a conflicting device at the mountpoint always causes Mount or Unmount to return an Err and change nothing is too broad. In src/app.ts, that check applies when the volume is untracked. A tracked Mount reuses its table entry without checking the mounted device, and a tracked Unmount does not perform that conflict check. Limit the instruction to untracked-volume paths.
 
 ## Verified
-- ✅ .github/copilot-instructions.md and all listed files to inspect exists
-- ✅ src/*.test.ts; package.json build and test scripts exists
-- ✅ parseConfig, createApp, RbdInterface, createVolumeLock, withVolumeLock, cleanupBestEffort exists
-- ✅ Rbd, CommandRunner, FileSystem, getMountedDevice, MountPointEntry exists
-- ✅ .github/skills/setup-node/ and .github/workflows/docker-image.yml exists
+- ✅ .github/copilot-instructions.md and all requested source, test, build, configuration, skill, and workflow files exists
+- ✅ parseConfig, Rbd, createApp, RbdInterface, createVolumeLock, withVolumeLock, cleanupBestEffort, CommandRunner, FileSystem, getMountedDevice, MountPointEntry exists
+- ✅ Node pin, build and test scripts, TypeScript settings, Docker stages, VERSION, and CI build/publish jobs exists
 
 ## Recommendation
-Correct the untracked-Unmount and CI-trigger descriptions before dispatch. The remaining documentation-only scope is feasible as one full-file replacement.
+Clarify that conflict detection and refusal to change anything describe untracked Mount and Unmount requests. The remaining documentation-only scope is feasible in one iteration.
