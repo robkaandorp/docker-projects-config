@@ -18,11 +18,11 @@ updated: 2026-09-28
 No issues found.
 
 ## Verified
-- ✅ docker-volume-rbd/src/server.ts: /VolumeDriver.List, Name: name, RBD_CONF_CLUSTER and RBD_CONF_KEYRING_USER exists
-- ✅ docker-volume-rbd/src/rbd.ts: Rbd.options, isMapped, map, unMap, list, create and remove exists
-- ✅ docker-volume-rbd/tsconfig.json, package.json and pnpm-lock.yaml exists
-- ✅ docker-volume-rbd/Dockerfile and README.md exists
-- ✅ docker-volume-rbd/src/mountPointEntry.ts, config.json, entrypoint.sh, build.sh, .github/workflows/docker-image.yml and .github/copilot-instructions.md exists
+- ✅ docker-volume-rbd/src/server.ts: /VolumeDriver.List uses Name: name; cluster and user have defaults and ToDo comments exists
+- ✅ docker-volume-rbd/src/rbd.ts: Rbd.options, isMapped, and all six specified rbd invocations exists
+- ✅ docker-volume-rbd/tsconfig.json, package.json, pnpm-lock.yaml, Dockerfile, and README.md exists
+- ✅ docker-volume-rbd/pnpm-lock.yaml: two YAML documents, with pnpm 12.4.2 in the first exists
+- ✅ docker-volume-rbd/config.json and the listed files not to change exists
 
 ## Recommendation
-Proceed. The goal is self-contained, the referenced code matches the description, and the acceptance criteria cover the compatibility-sensitive changes.
+Dispatch as written. The changes are limited to two production source files plus configuration, lockfile, comment, and documentation updates; the acceptance criteria cover the principal compatibility risks.
