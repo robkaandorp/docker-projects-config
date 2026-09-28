@@ -90,3 +90,42 @@ I fixed the single reviewer issue by replacing the `tr -d '[:space:]'` parsing w
 <｜DSML｜ calls>
 <｜DSML｜ invoke name="report_code_changes">
 <｜DSML｜ parameter name="filesModified" string="false">[".github/skills/setup-node/install-node.sh"]
+
+### Brain Summary (Iteration 2)
+
+Iteration resulted in: FAIL. Proceeding to iteration 3.
+
+## Iteration 3
+
+### Brain Plan
+
+Phases: Coding → Testing → Review → Improve → Merging
+
+Reasoning: Retry after iteration 2's coding phase FAILED: the coder emitted only \"done\" and never called its mandatory report tool (likely an API error or hallucinated tool call), so the phase result is untrusted despite plausible file stats (+107 -11). The underlying review issue from iteration 1 (interior whitespace deleted before integer validation) is still unverified as fixed. The plan therefore re-runs coding with explicit instructions to first inspect the feature branch's actual state, complete/redo the minimal validation fix, and — critically — call the report tool this time; then testing (verifying the branch state independently and covering the internally-spaced-value rejection cases), review, improve (required for a retry with prior failures — the agents.md must capture the missing-report-call failure mode as well as the validation lesson), and merging. Standard tiers throughout: the coding work is small and fully specified; the failure was process/tooling, not reasoning difficulty.
+
+**Coding**: RETRY after an infrastructure failure in iteration 2: the coder emitted only "done" and never called its mandatory report tool, so the phase was marked FAIL. The file stats (+107 -11, up from +105 -11 in iteration 1) suggest the fix may have been partially made, but this is unverified.
+
+FIRST: inspect your own feature-branch state with git log and git diff against your previous commit (2bc2858) to see what iteration 2 actually left on the branch. Then either complete the fix or redo it — do not blindly reimplement, and do not assume the branch is clean.
+
+The one outstanding review issue (verbatim): .github/skills/setup-node/install-node.sh:10-11 — `tr -d '[:space:]'` deletes internal whitespace before the integer check, so an invalid `.node-version` such as `2 4` becomes `24` and passes. Fix: trim ONLY the edges (leading/trailing whitespace), leave the interior untouched, then validate the unchanged interior against `^[0-9]+$`. Values like `2 4`, `24.1`, `2 4 4`, `abc`, or empty-after-trim must fail with a clear stderr message and nonzero exit; ` 24 ` (whitespace-padded) must still succeed; `24\n` keeps working.
+
+Keep the fix minimal — adjust only whitespace handling and validation in install-node.sh; do not restructure the script or change the download/extract/corepack/PATH-output logic. Do not touch .node-version, Dockerfile, package.json, pnpm-lock.yaml, SKILL.md, or prohibited files (src/**, tsconfig.json, config.json, entrypoint.sh, build.sh, README.md, .github/workflows/docker-image.yml, .github/copilot-instructions.md).
+
+Self-check: export PATH="$(.github/skills/setup-node/install-node.sh):$PATH" (re-run in each fresh shell); verify `2 4`, `24.1`, `abc`, empty fail with exit 1 and ` 24 ` succeeds (test in a scratch copy, restore the real .node-version to exactly `24\n` afterwards); rm -rf node_modules dist && pnpm install --frozen-lockfile && pnpm run build pass; git status shows no Node install files in the repo.
+
+CRITICAL PROCESS REQUIREMENT: when your coding work is complete you MUST call your phase report tool (report_phase_completion or the role's designated reporting tool). Iteration 2 failed solely because the report call was skipped. If your first report attempt errors, retry it — never end the phase without the report being recorded. Commit with git add -A && git commit.
+**Testing**: RETRY testing. The coder claims the iteration-2 fix but the phase was marked FAIL (no report tool call) — verify the actual branch state independently rather than trusting the narrative. First check git log/git diff to see what is committed since 2bc2858.
+
+Then re-establish the toolchain (fresh shell each time): export PATH="$(.github/skills/setup-node/install-node.sh):$PATH"
+
+1. THE REJECTED CASE (primary): in a scratch copy of the repo, set .node-version to `2 4` and run the script — it MUST fail with nonzero exit and a clear stderr message, no download, no stdout path. Also `24.1`, `abc`, and whitespace-only/empty. Restore the real .node-version to exactly `24\n` afterwards (od -c).
+2. Positive path: ` 24 ` (padded) succeeds; clean-state run (remove install dir, no node on PATH) installs Node 24.x with stdout containing ONLY the bin path; node --version v24.*; pnpm --version 12.4.2.
+3. Idempotency: second run reuses install, no download, same stdout path.
+4. Build: rm -rf node_modules dist && pnpm install --frozen-lockfile && pnpm run build (strict tsconfig) succeed.
+5. Repo cleanliness: git status shows no Node install files inside the repository.
+6. Dockerfile/lockfile spot-check (inspection): COPY placement and setup_24.x expansion unchanged; @types/node still ^24.x; packageManager untouched.
+
+No test framework exists in this repo — that is acceptable for these environmental/tooling criteria; report any untestable items explicitly rather than adding a framework; you may write/repair tests if ordinary coverage is genuinely missing. Report all results with report_test_results, including exact commands and full output for any failure. Do not create report files.
+**Review**: RETRY review. Two things changed since the last approved state: the install-node.sh validation fix (edge-only whitespace trim + interior ^[0-9]+$ validation) and a coder reporting failure in iteration 2 (code may have been committed without a proper report). Verify the fix satisfies the original issue verbatim: `tr -d '[:space:]'` no longer deletes internal whitespace before the integer check; only edges are trimmed; the unchanged interior is validated against `^[0-9]+$`; `2 4`, `24.1`, `abc`, empty-after-trim rejected with clear stderr message and nonzero exit; ` 24 ` succeeds. Then re-check the full diff with workspace diff commands: exactly the six permitted files, .node-version exactly `24\n`, script executable, Dockerfile base-stage-only change (COPY before the RUN, setup_24.x, no setup_lts.x), package.json @types/node ^24.x with packageManager untouched, pnpm-lock.yaml pnpm-regenerated with two-document structure (transitive @types/node@26.5.1 from @types/express acceptable), SKILL.md exact frontmatter. Files NOT to change (strict): src/**, tsconfig.json, config.json, entrypoint.sh, build.sh, README.md, .github/workflows/docker-image.yml, .github/copilot-instructions.md. Use the testing results as evidence — do NOT reject because you cannot run tests yourself. Do not reject a legitimate transitive @types/node major in the lockfile. Call report_review_verdict.
+**Improve**: Analyze the iteration's results with focus on the NEW failure mode: iteration 2's coder finished its work but skipped the mandatory phase report (likely an API error or hallucinated tool call), causing a FAIL despite probable correct code. Update the docker-volume-rbd agents.md files (work only in the config repo's agents/ folder using file tools; no git commands) to capture: (1) always end a phase by calling the designated report tool and retry the call if it errors — a completed but unreported phase counts as a failure; (2) retain the iteration-1 lesson: validate input values by trimming only the edges and checking the unchanged interior (no normalization that deletes interior whitespace), and self-check internally-spaced malformed variants.
+**Merging**: Merge the feature branch into the base branch after review approval. Ensure both iteration-1 work (commit 2bc2858) and the iteration-2/3 validation fix are present.
