@@ -91,6 +91,7 @@ models:
     supports_vision: true
   - name: copilot/claude-sonnet-5.5
     context_window: 328000
+    supports_vision: true
   sub_agent_models:
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
