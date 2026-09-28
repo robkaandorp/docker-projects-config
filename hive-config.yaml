@@ -29,7 +29,7 @@ workers:
   tester:
     model: ollama-cloud/glm-5.3-flash
     premium_model: copilot/gpt-6-sol
-    reasoning_effort: extra_high
+    reasoning_effort: high
     premium_reasoning_effort: high
   improver:
     model: copilot/gpt-6-luna
@@ -50,7 +50,7 @@ orchestrator:
   brain_max_steps: 50
   branch_cleanup_delay_hours: 48
   worker_task_timeout_minutes: 60
-  reasoning_effort: extra_high
+  reasoning_effort: high
 models:
   compaction_model: copilot/gpt-6-luna
   available_models:
