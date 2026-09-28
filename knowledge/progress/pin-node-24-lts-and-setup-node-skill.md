@@ -137,3 +137,7 @@ I inspected the branch first as instructed: iteration 2's fix was already commit
 ### tester (narrative)
 
 I verified the iteration-2 whitespace-trim fix in install-node.sh by cloning the repo to a scratch copy and testing seven .node-version contents. My initial test harness had a bug — printf '%s' doesn't interpret \n escapes, so my "expected success" cases contained a literal backslash-n and legitimately failed — after diagnosing this with od -c and redoing with printf '%b', all cases behaved correctly: '2 4', '24.1', 'abc', whitespace-only, and empty all fail cleanly with no download, while ' 24 ' and '24\n' succeed. The main repo passed the full regression (clean-state install of v24.21.0, idempotent rerun, frozen-lockfile install, strict tsc build) and the real .node-version was confirmed byte-identical to '24\n' via od -c after all scratch testing. The coder's fix commit 62fc32e is present and correct; working tree stayed clean throughout.
+
+### reviewer (narrative)
+
+I read the full goal, inspected the full merge-base diff and the direct fix commit, and checked file modes, version bytes, Dockerfile expansion, and lockfile structure. The iteration-only diff was empty because HEAD is the fix commit, so comparing it with its parent showed the precise four-insertion/two-deletion validation change. The edge-only trim resolves the prior internally spaced version bug without modifying installation behavior, and the tester's 14 passing checks substantiate the clean-state run and build.
