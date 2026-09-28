@@ -57,3 +57,7 @@ Round 2 added per-volume serialisation to docker-volume-rbd. I built a `createVo
 ### tester (narrative)
 
 For round 2 I reviewed the coder's createVolumeLock implementation and its six new concurrency tests before running anything, then rebuilt (tsc, exit 0) and ran the full 89-test suite in one sequential pnpm test run. Everything passed on the first attempt, so I had no test authoring or repair work to do; the main effort went into verifying the concurrency tests actually assert real serialisation rather than timing luck — the stub's Gate mechanism holds specific calls open so a queued request provably cannot start early, and the lock is also exercised directly without HTTP. I confirmed boundedness of the lock map via the pendingVolumes() assertions and verified all 11 round-1 rollback tests still pass. Full log kept at /tmp/test-round2-attempt1.log; nothing to commit since the tree was clean.
+
+### reviewer (narrative)
+
+I compared both coding rounds against the specified merge base and inspected the implementation and test diffs, with a separate look at round 2’s locking changes. The ownership flags, best-effort cleanup and wrapped mount error match the requested failure cases; the per-volume Promise chains serialize same-name operations without retaining settled keys or blocking other names. I also reconciled the changed files with the goal and relied on the structured tester report for the successful build and 89 passing tests.
