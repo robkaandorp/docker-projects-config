@@ -15,21 +15,16 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The goal is not ready for dispatch against the current checkout. The prerequisite changes have not landed: src/app.ts, src/config.ts, and src/*.test.ts are absent; package.json has no test script; and the workflow neither tests nor runs docker plugin push. Keep this goal blocked until its stated dependencies land, then verify the documentation against the resulting files.
+### [MAJOR] The untracked-volume instructions say Unmount performs a best-effort unmount and unmap and returns success. In src/app.ts, a failed unmount prevents unmap, and any cleanup error returns a nonempty Err. Specify that it returns success only when the attempted cleanup succeeds; distinguish this from best-effort rollback.
+
+### [MINOR] The workflow does not run on every push or pull request. .github/workflows/docker-image.yml limits both triggers to master and develop. Qualify the CI description accordingly.
 
 ## Verified
-- ✅ .github/copilot-instructions.md exists
-- ✅ src/server.ts exists
-- ❌ src/config.ts / parseConfig does not exist
-- ❌ src/app.ts / createApp does not exist
-- ✅ src/rbd.ts / Rbd exists
-- ✅ src/mountPointEntry.ts / MountPointEntry exists
-- ❌ src/*.test.ts does not exist
-- ✅ tsconfig.json exists
-- ✅ Dockerfile exists
-- ✅ package.json exists
-- ✅ config.json exists
-- ✅ .github/workflows/docker-image.yml exists
+- ✅ .github/copilot-instructions.md and all listed files to inspect exists
+- ✅ src/*.test.ts; package.json build and test scripts exists
+- ✅ parseConfig, createApp, RbdInterface, createVolumeLock, withVolumeLock, cleanupBestEffort exists
+- ✅ Rbd, CommandRunner, FileSystem, getMountedDevice, MountPointEntry exists
+- ✅ .github/skills/setup-node/ and .github/workflows/docker-image.yml exists
 
 ## Recommendation
-Retain the documentation-only scope and source-verification rule. Dispatch only after the named prerequisites land; the proposed work should then be feasible as one full-file replacement.
+Correct the untracked-Unmount and CI-trigger descriptions before dispatch. The remaining documentation-only scope is feasible as one full-file replacement.
