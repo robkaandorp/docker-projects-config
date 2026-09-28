@@ -1,0 +1,53 @@
+---
+title: Progress: ci-tests-and-dockerhub-publish
+type: scratch
+status: draft
+author: composer
+tags: []
+links: []
+created: 2026-09-28
+updated: 2026-09-28
+---
+
+# Progress: ci-tests-and-dockerhub-publish
+
+## Iteration 1
+
+### Brain Plan
+
+Phases: Coding → DocWriting → Testing → Review → Merging
+
+Reasoning: Clean first iteration with no prior feedback, so no improve phase. The goal is primarily a CI/CD implementation task (new VERSION file, rewritten two-job workflow, Dockerfile test step, .dockerignore, build.sh) plus one explicitly requested README documentation update, so coding and docwriting are planned as a single content block followed by one Testing round (R7: both content phases before the first Testing), then Review and Merging. Prerequisite verified on develop: package.json test script and src/*.test.ts exist. Workflow YAML with a fail-closed release guard is intricate but the goal spec is extremely detailed, so the standard tier suffices.
+
+**Coding**: Work in the docker-volume-rbd repo. Prerequisite check (already confirmed by the orchestrator, but re-verify before committing): package.json has "test": "tsc && node --test dist/*.test.js" and src/*.test.ts exist. If the environment lacks node, use the .github/skills/setup-node skill (install-node.sh) to bootstrap the pinned Node + pnpm. Implement exactly the following, and nothing outside it:
+
+1. Create VERSION at the repo root containing exactly one line: v20.2-r1 (with a trailing newline).
+
+2. .github/workflows/docker-image.yml — replace the current single-job workflow with a two-job workflow. Triggers: push and pull_request on branches master and develop. Workflow-level permissions: contents: read. Remove ALL uses of vars.VERSION_TAG and github.run_number.
+   Job 'build' (runs on every trigger):
+   - actions/checkout at the current major (v4+) with persist-credentials: false.
+   - A version step: read VERSION, validate it matches ^v[0-9]+\.[0-9]+-r[0-9]+$ (fail the step if not), then compute FULL_VERSION (the file's content) and BASE_VERSION (content minus the -r* suffix, e.g. v20.2) and export both via $GITHUB_ENV. Also expose them as job outputs (outputs.full_version / outputs.base_version) for the publish job.
+   - Build, export and tgz steps, adapted from the existing ones: docker build . (the Dockerfile runs the tests), docker create/export rootfs into plugin/, cp config.json plugin/, then 'sudo tar -czf docker-volume-rbd-${FULL_VERSION}.tgz plugin/' (same sudo tar pattern as today).
+   - Upload the tgz with actions/upload-artifact at the current major, retention-days: 1. This artifact is the ONLY way build output reaches the publish job.
+   Job 'publish':
+   - needs: build; if: github.event_name == 'push' && github.ref == 'refs/heads/master'.
+   - Job-level permissions: contents: write — the ONLY place write is granted anywhere in the file.
+   - concurrency: { group: publish-master, cancel-in-progress: false } with a one-line YAML comment noting that GitHub keeps at most one pending job per group so an older waiting publish may be superseded by a newer master push (acceptable for this low-traffic repo; re-run the workflow to publish it).
+   - It does NOT check out code and does NOT build. Steps in order:
+     1. Download the artifact, then 'sudo tar -xzf docker-volume-rbd-${FULL_VERSION}.tgz' so plugin/ is recreated with ownership preserved.
+     2. Already-released guard, failing closed, running with set -euo pipefail: check BOTH 'gh api repos/${{ github.repository }}/releases/tags/${FULL_VERSION}' AND 'gh api repos/${{ github.repository }}/git/ref/tags/${FULL_VERSION}' with env GH_TOKEN: ${{ github.token }}. For each call: HTTP 404 (matched explicitly, e.g. by capturing stderr and matching 'HTTP 404') means continue; HTTP 200 means fail with a message like 'VERSION <x> was already released (or tag <x> already exists); bump the revision in VERSION'; ANY other outcome (auth error, rate limit, network failure) must fail the job saying the release check could not be completed — never treat a failed lookup as not-released. It runs inside the serialised job, so no additional queueing.
+     3. Log in with docker/login-action at the current major using secrets DOCKERHUB_USERNAME and DOCKERHUB_TOKEN (these secrets already exist in the repo).
+     4. Publish both tags as a MANAGED PLUGIN: 'sudo docker plugin create robkaandorp/rbd:${FULL_VERSION} plugin/' then 'docker plugin push robkaandorp/rbd:${FULL_VERSION}'; same for robkaandorp/rbd:${BASE_VERSION}. Use docker plugin create/push, NOT docker push.
+     5. LAST step: 'gh release create "$FULL_VERSION" --target "${{ github.sha }}" docker-volume-rbd-${FULL_VERSION}.tgz' with GH_TOKEN env. --target is REQUIRED (default branch is develop). Do NOT restore any 'gh auth login --with-token' line — every gh call must use GH_TOKEN only.
+
+3. Dockerfile: in the builder stage ONLY, add 'RUN pnpm test' between the existing 'RUN pnpm run build' and 'RUN pnpm prune --prod'. Change nothing else (base stage .node-version/nodesource lines stay as-is).
+
+4. .dockerignore: add '.git/' and '*.tgz' as new lines, keeping the existing plugin/, node_modules/, dist/ entries. Rationale: the builder stage COPY . . otherwise ships .git (including checkout credentials) into the published plugin rootfs.
+
+5. build.sh: derive the version from VERSION instead of the hardcoded 'version=v20.2': version=$(cat VERSION) then version=${version%-r*}. Change ONLY the version derivation; every other line stays as is.
+
+Do NOT touch: src/**, package.json, pnpm-lock.yaml, config.json, entrypoint.sh, tsconfig.json, .node-version, .github/skills/**, .github/copilot-instructions.md. YAML correctness matters: the workflow cannot be executed by CI from a worker environment, so validate the YAML syntax carefully (e.g. with a YAML parser if available) and re-read the file before committing. Commit with git add -A && git commit.
+**DocWriting**: Work in the docker-volume-rbd repo. Edit README.md ONLY: add a short 'Releases / CI' section covering: (1) develop and PR builds build, test and package but never publish; (2) versioning via the VERSION file in the form v<ceph>-r<revision> (initial v20.2-r1), with the revision bumped on develop before each merge to master; (3) merging to master publishes robkaandorp/rbd:<base> and robkaandorp/rbd:<full> to Docker Hub via docker plugin push and creates a GitHub release plus git tag <full> on the exact master commit that was built; the publish job fails if that version's release or tag already exists (bump the revision); (4) publishes are serialised: if several master pushes land in quick succession an intermediate one may be superseded and skipped — re-run its workflow to publish it; (5) required repo secrets DOCKERHUB_USERNAME and DOCKERHUB_TOKEN, and that the VERSION_TAG repository variable is no longer needed. Make no other README changes. Do not run any git commands. After editing, run the build skill to verify the project still compiles, then call report_doc_changes.
+**Testing**: Run the test skill (or "pnpm test": tsc && node --test dist/*.test.js) in the docker-volume-rbd repo to confirm all existing unit tests still pass — the Dockerfile/.dockerignore/build.sh/VERSION/workflow changes must not affect them. Additionally verify what is verifiable locally: the new VERSION file exists with content v20.2-r1; build.sh version derivation produces v20.2 (you may run only the derivation snippet with bash in isolation, NOT the full build.sh which does git pull and docker operations); .dockerignore contains .git/ and *.tgz plus the original entries; the Dockerfile builder stage contains RUN pnpm test in the right position; and the workflow YAML parses as valid YAML (e.g. via a node yaml parse or python yaml if available) with the expected job structure. If a docker build is available locally, optionally build to confirm the builder stage runs pnpm test and the image contains no /app/.git — skip gracefully if docker is unavailable (workers historically cannot run docker). Call report_test_results with a clear pass/fail per check.
+**Review**: Review the full workspace diff of the feature branch. Files to change: VERSION (new), .github/workflows/docker-image.yml, Dockerfile (builder stage only), .dockerignore, build.sh (version derivation only), README.md (new section only). Files NOT to change (strict): src/**, package.json, pnpm-lock.yaml, config.json, entrypoint.sh, tsconfig.json, .node-version, .github/skills/**, .github/copilot-instructions.md. Verify against the acceptance criteria: VERSION contains exactly v20.2-r1; workflow triggers cover master+develop for push and pull_request; workflow-level permissions contents: read with contents: write ONLY on the publish job; publish has needs: build, the master-push if, concurrency group publish-master with cancel-in-progress: false and the documented pending-run-limitation comment; publish does not check out or build code; checkout uses persist-credentials: false; .dockerignore excludes .git/ and *.tgz; no vars.VERSION_TAG or github.run_number anywhere; all gh usage authenticates via GH_TOKEN with no gh auth login line; the already-released guard checks both release and tag endpoints and fails closed (only explicit HTTP 404 continues; any other failure aborts); gh release create is the last step and passes --target "${{ github.sha }}"; docker plugin create/push used for BOTH tags; build.sh derives the base tag from VERSION; Dockerfile builder stage has RUN pnpm test after build and before prune. Test-phase results must be used to confirm all existing tests pass — do not reject because you could not run tests yourself. Call report_review_verdict.
+**Merging**: Merge the feature branch per the standard merging procedure. Confirm all required reports are present: docwriter's report_doc_changes, tester's report_test_results, reviewer's approving verdict. Note for the owner in the merge summary: the repo secrets DOCKERHUB_USERNAME/DOCKERHUB_TOKEN already exist; the owner should watch the first master run to confirm the publish job works, since CI execution cannot be tested from a worker environment. CI is the only tag creator (CopilotHive tag-on-release is disabled).
