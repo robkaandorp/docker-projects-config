@@ -15,23 +15,21 @@ updated: 2026-09-28
 
 ## Issues
 
-### [CRITICAL] The stated prerequisite, restructure-for-testability-and-add-tests, is not present in the repository: src/app.ts and src/*.test.ts do not exist, createApp does not exist, Rbd has no injectable command runner, and package.json has no test script. The handlers are still in src/server.ts, which this goal forbids changing. Make the prerequisite an explicit dependency and dispatch this goal only after it lands, or revise the permitted files and scope.
+### [MAJOR] The prerequisite has not landed in docker-volume-rbd: src/app.ts and src/*.test.ts do not exist, src/server.ts still contains the route handlers, Rbd has no injectable runner or fs functions, and package.json has no test script. Do not dispatch this goal until `restructure-for-testability-and-add-tests` is present; the permitted files cannot establish that prerequisite.
 
-### [MINOR] Clarify Create rollback when rbd.map throws after creating a mapping: how should the worker determine whether this request owns the mapping before calling unMap? Rollback must not unmap a pre-existing mapping.
+### [MAJOR] The ownership rule for Create is too broad. After create succeeds, a failed map does not establish that this request owns a mapping; another process could have mapped the new image. Calling unMap based only on isMapped could undo that other mapping. Clarify that the guarantee is limited to this process, or specify how externally created mappings are protected.
 
-### [MINOR] Mount-directory cleanup should remove only a directory created by the failed request; Rbd.mount currently calls recursive mkdir without recording whether the directory existed beforehand.
+### [MINOR] The opening guarantee is stronger than the proposed behavior: best-effort cleanup can leave a mapping behind, and an in-process lock cannot serialise requests across plugin processes. State these limits explicitly.
 
 ## Verified
-- ❌ src/app.ts does not exist
-- ❌ createApp does not exist
-- ✅ src/rbd.ts and Rbd exists
-- ❌ Rbd injectable command runner does not exist
-- ✅ Rbd.isMapped/map/unMap/create/makeFilesystem/remove/mount/unmount exists
-- ❌ src/*.test.ts does not exist
-- ❌ package.json test script does not exist
-- ✅ src/server.ts route handlers and mountPointTable exists
-- ✅ src/mountPointEntry.ts and references exists
-- ✅ package.json build script exists
+- ❌ docker-volume-rbd/src/app.ts / createApp does not exist
+- ❌ docker-volume-rbd/src/*.test.ts does not exist
+- ✅ docker-volume-rbd/src/server.ts and VolumeDriver.Create, Remove, Mount, Unmount handlers exists
+- ✅ docker-volume-rbd/src/rbd.ts / Rbd, isMapped, map, unMap, create, makeFilesystem, remove, mount exists
+- ❌ Rbd injectable command runner and fs functions does not exist
+- ❌ docker-volume-rbd/package.json / test script does not exist
+- ✅ docker-volume-rbd/src/mountPointEntry.ts / references and hasReference exists
+- ❌ docker-volume-rbd/src/config.ts does not exist
 
 ## Recommendation
-Add an explicit dependency on the testability restructure and verify it has landed before dispatch. Once it has, this is a focused, feasible goal; clarify mapping ownership and directory cleanup while retaining the proposed tests.
+Wait for and verify the prerequisite before dispatch. Then clarify mapping ownership under external concurrency and limit the stated guarantee to in-process serialisation and best-effort rollback. The proposed two-production-file scope is otherwise appropriate.
