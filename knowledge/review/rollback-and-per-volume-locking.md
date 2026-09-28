@@ -15,21 +15,16 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The prerequisite has not landed in docker-volume-rbd: src/app.ts and src/*.test.ts do not exist, src/server.ts still contains the route handlers, Rbd has no injectable runner or fs functions, and package.json has no test script. Do not dispatch this goal until `restructure-for-testability-and-add-tests` is present; the permitted files cannot establish that prerequisite.
-
-### [MAJOR] The ownership rule for Create is too broad. After create succeeds, a failed map does not establish that this request owns a mapping; another process could have mapped the new image. Calling unMap based only on isMapped could undo that other mapping. Clarify that the guarantee is limited to this process, or specify how externally created mappings are protected.
-
-### [MINOR] The opening guarantee is stronger than the proposed behavior: best-effort cleanup can leave a mapping behind, and an in-process lock cannot serialise requests across plugin processes. State these limits explicitly.
+### [CRITICAL] The prerequisite has not landed in the current repository. src/app.ts and src/*.test.ts do not exist, handlers are still in src/server.ts, Rbd has no injectable command runner or fs functions, and package.json has no test script. The goal cannot be completed within its file restrictions or tested as specified until restructure-for-testability-and-add-tests lands.
 
 ## Verified
-- ❌ docker-volume-rbd/src/app.ts / createApp does not exist
-- ❌ docker-volume-rbd/src/*.test.ts does not exist
-- ✅ docker-volume-rbd/src/server.ts and VolumeDriver.Create, Remove, Mount, Unmount handlers exists
-- ✅ docker-volume-rbd/src/rbd.ts / Rbd, isMapped, map, unMap, create, makeFilesystem, remove, mount exists
+- ❌ src/app.ts / createApp does not exist
+- ❌ src/*.test.ts does not exist
+- ❌ package.json pnpm test script does not exist
+- ✅ src/server.ts / Create, Remove, Mount and Unmount handlers exists
+- ✅ src/rbd.ts / Rbd, isMapped, map, unMap, create, makeFilesystem, remove, mount exists
 - ❌ Rbd injectable command runner and fs functions does not exist
-- ❌ docker-volume-rbd/package.json / test script does not exist
-- ✅ docker-volume-rbd/src/mountPointEntry.ts / references and hasReference exists
-- ❌ docker-volume-rbd/src/config.ts does not exist
+- ✅ src/mountPointEntry.ts / MountPointEntry.references exists
 
 ## Recommendation
-Wait for and verify the prerequisite before dispatch. Then clarify mapping ownership under external concurrency and limit the stated guarantee to in-process serialisation and best-effort rollback. The proposed two-production-file scope is otherwise appropriate.
+Keep the stated prerequisite as a hard dispatch dependency and re-review after it lands. At that point, verify the new app, injection points, tests and test script before assigning this goal.
