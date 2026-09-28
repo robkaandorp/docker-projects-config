@@ -1,0 +1,39 @@
+{
+  "iteration": 1,
+  "timestamp": "2026-09-28T20:24:55.0437623Z",
+  "duration": "00:13:16.8064728",
+  "buildSuccess": true,
+  "totalTests": 71,
+  "passedTests": 71,
+  "failedTests": 0,
+  "coveragePercent": 0,
+  "integrationTestsTotal": 0,
+  "integrationTestsPassed": 0,
+  "runtimeVerified": false,
+  "verdict": "Pass",
+  "testReportSummary": "",
+  "issues": [
+    "pnpm silently exits 0 when the \u0027test\u0027 script is missing (pnpm\u0027s own default \u0027test\u0027 command) \u2014 the round-2 test script must exist so pnpm test is a real gate; consider guarding with an explicit script or checking dist/*.test.js discovery in round 2 review.",
+    "Coding round 2 pending: all required test coverage listed in the summary is not yet written."
+  ],
+  "reviewIssuesFound": 0,
+  "reviewIssues": [],
+  "reviewVerdict": "Approve",
+  "retryCount": 0,
+  "reviewRetryCount": 0,
+  "testRetryCount": 0,
+  "phaseDurations": {},
+  "promptTokens": 0,
+  "completionTokens": 0,
+  "agentsMdVersions": {
+    "coder": "v002",
+    "tester": "v002",
+    "reviewer": "v000",
+    "improver": "v000",
+    "orchestrator": "v000",
+    "docwriter": "v000"
+  },
+  "custom": {},
+  "improverSkipped": false,
+  "improverSkipReason": null
+}
