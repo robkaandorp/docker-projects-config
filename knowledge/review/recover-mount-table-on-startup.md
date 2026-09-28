@@ -15,20 +15,19 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The goal assumes prior refactors that are not present in docker-volume-rbd: src/app.ts and createApp do not exist; route handlers and mountPointTable are in src/server.ts. Rbd has no injectable command runner, and per-volume serialization is not implemented. Specify the prerequisite goals and their ordering, or explicitly include this work in the scope.
+### [MAJOR] The prerequisites have not landed in the checked-out docker-volume-rbd code: src/app.ts and src/*.test.ts are absent, handlers and mountPointTable remain in src/server.ts, Rbd has no injectable runner, and package.json has no test script. Do not dispatch this goal until both named prerequisites are merged and their resulting structure is verified.
 
-### [MAJOR] The stated test acceptance criteria cannot currently be run: there are no src/*.test.ts files and package.json has no test script. Include test setup in the scope or make it an explicit prerequisite.
-
-### [MINOR] Clarify what should happen if recovery finds a mount but a later Unmount ID is unknown after the single implicit reference has already been released. The proposed one-reference policy cannot account for multiple pre-restart containers; the requested code comment should make that operational risk clear.
+### [MINOR] The recovery tests should cover a device mounted at the wrong path, not just mapped-but-unmounted images. Recovery must match both the mapped device and the expected mountpoint to avoid treating an unrelated mount as this volume.
 
 ## Verified
-- ❌ docker-volume-rbd/src/app.ts and createApp does not exist
-- ✅ docker-volume-rbd/src/rbd.ts and Rbd.isMapped exists
-- ❌ Rbd.listMapped and injectable command runner does not exist
-- ✅ docker-volume-rbd/src/server.ts, mountPointTable, and getMountPoint exists
-- ✅ docker-volume-rbd/src/mountPointEntry.ts, MountPointEntry.references, and hasReference exists
+- ❌ docker-volume-rbd/src/app.ts does not exist
+- ✅ docker-volume-rbd/src/server.ts and mountPointTable exists
+- ✅ docker-volume-rbd/src/server.ts getMountPoint exists
+- ✅ docker-volume-rbd/src/rbd.ts Rbd.isMapped exists
+- ❌ docker-volume-rbd/src/rbd.ts Rbd.listMapped does not exist
+- ✅ docker-volume-rbd/src/mountPointEntry.ts MountPointEntry.references and hasReference exists
 - ❌ docker-volume-rbd/src/*.test.ts does not exist
 - ❌ docker-volume-rbd/package.json test script does not exist
 
 ## Recommendation
-Dispatch the assumed app extraction, runner injection, serialization, and test setup as ordered prerequisites. Then dispatch recovery against the resulting codebase; alternatively, revise and split this goal to include those changes explicitly.
+Keep the prerequisite ordering, but block dispatch until both prerequisite goals land. Then recheck the stated API and test setup, and add a wrong-mountpoint recovery test. The proposed implementation scope is otherwise reasonable.
