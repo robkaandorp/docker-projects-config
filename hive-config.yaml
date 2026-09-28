@@ -89,6 +89,8 @@ models:
   - name: copilot/gpt-6-sol
     context_window: 400000
     supports_vision: true
+  - name: copilot/claude-sonnet-5.5
+    context_window: 328000
   sub_agent_models:
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
