@@ -27,3 +27,7 @@ Reasoning: Documentation-only goal: the single artifact is .github/copilot-instr
 ### docwriter (narrative)
 
 I read the requested implementation, test, packaging, and workflow files before replacing the outdated instructions. The resulting concise guide captures actual behavior, including the distinction between tracked and untracked volume handling and exact API response conventions. Markdown whitespace checks passed, the pinned Node/pnpm build succeeded, and all 108 tests passed; only the requested instructions file is modified.
+
+### tester (narrative)
+
+Verified a documentation-only change to .github/copilot-instructions.md. The diff against the merge base confirmed no source, test, or config files changed. Node was missing, so I bootstrapped it with the repository's setup-node skill (Node v24.21.0, pnpm 12.4.2 via Corepack), ran pnpm install --frozen-lockfile, pnpm run build (tsc, exit 0), and the full pnpm test suite (node:test): 108 tests, 108 passed, 0 failed, exit code 0. No fixes were made and nothing was committed, per the verification-only instructions.
