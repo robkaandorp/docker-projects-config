@@ -1,7 +1,7 @@
 ---
 title: docker-volume-rbd: owner decisions and conventions
 type: memory
-status: draft
+status: active
 author: composer
 tags: [docker-volume-rbd, decisions, branching, ci]
 links: []
