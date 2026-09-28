@@ -42,3 +42,9 @@ Things the owner (Rob Kaandorp) decided, to keep in mind when planning goals for
 
 ## Restart handling (decided 2026-09-28)
 - No startup recovery of the mount table. Untracked volumes are handled when Docker asks about them: Unmount of an untracked volume unmounts and unmaps it if its own device is mounted; Mount adopts an existing mount of the same device. A conflicting device at the mountpoint returns an Err and nothing is changed.
+
+
+
+## Tag ownership (decided 2026-09-28)
+- CopilotHive's "tag on release / merge to master" option stays **disabled** for docker-volume-rbd. The GitHub Actions workflow is the only thing that creates release tags: `gh release create "$FULL_VERSION" --target "${{ github.sha }}"` on push to master.
+- `--target` is required because GitHub's default branch is `develop`. Without it, `gh release create` would put a new tag on develop's HEAD.
