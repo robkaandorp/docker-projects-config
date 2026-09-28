@@ -63,3 +63,7 @@ I validated the docker-volume-rbd iteration by first reviewing the full diff aga
 ### reviewer (narrative)
 
 I read the full goal, reviewed the complete merge-base diff, and inspected the surrounding server, Rbd, Dockerfile, package, and lockfile code. The six rbd call sites consistently use a conditional helper while non-rbd commands remain untouched; the lockfile keeps pnpm's two-document format and matches the explicit Node 22 type dependency. I also checked the structured tester report for the clean frozen install, strict build, and runtime compatibility probes, all of which passed; there were no issues requiring changes.
+
+### improver (narrative)
+
+The agent-file listing and size checks showed that all requested guidance files were absent, so there was no existing guidance to duplicate or rewrite. I added only broadly reusable lessons supported by the iteration notes, including reliable phase reporting, changed-file reconciliation, baseline-aware invocation tests, lockfile validation, negative-control probes, and practical documentation validation. I re-read each created file and confirmed its content and size; no code or tests were touched.
