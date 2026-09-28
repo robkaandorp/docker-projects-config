@@ -55,3 +55,8 @@ Things the owner (Rob Kaandorp) decided, to keep in mind when planning goals for
 - Pin the Node **major** in `.node-version` at the repo root (currently `24`, Krypton Active LTS). It's the single source of truth: the Dockerfile derives nodesource `setup_<major>.x` from it, and the `@types/node` major matches it.
 - No floating `setup_lts.x`. Moving to the next LTS (26 becomes LTS on 2026-10-28) is a deliberate bump: `.node-version` + `@types/node` major + regenerating the lockfile with pnpm.
 - Worker images don't have Node. The repo skill `.github/skills/setup-node/` (`install-node.sh`) installs the pinned major into /tmp with SHA-256 verification and enables Corepack pnpm. Note: Node 25+ no longer bundles Corepack, so a bump to 26 needs `npm i -g corepack` or an equivalent in the skill/Dockerfile.
+
+
+
+## Docker Hub secrets (2026-09-28)
+- The owner has configured the `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets for docker-volume-rbd. No further setup is needed for the master `publish` job.
