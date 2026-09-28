@@ -7,7 +7,6 @@ repositories:
   ci_timeout_minutes: 30
   release:
     merge_to: master
-    tag_branch: master
 - name: drone-portainer
   url: https://github.com/robkaandorp/drone-portainer.git
   default_branch: master
