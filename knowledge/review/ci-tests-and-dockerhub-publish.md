@@ -15,9 +15,7 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The release and tag checks are not atomic. Concurrent master runs using the same VERSION can both pass the guard, then publish conflicting Docker tags or create a release for only one of the built commits. Require serialization of master publish runs, without canceling a publish already in progress.
-
-### [MAJOR] Granting contents: write to the job that builds pull-request code gives that job more permission than it needs. Specify how write permission will be confined to master publishing, or explicitly document the repository controls relied on to make this acceptable.
+### [MAJOR] The specified GitHub Actions concurrency group serializes running publish jobs but does not guarantee that every master push publishes. GitHub Actions permits only one pending run per group; a newer pending run can replace an older one even with cancel-in-progress: false. This conflicts with the requirement that master pushes publish automatically.
 
 ## Verified
 - ✅ docker-volume-rbd/.github/workflows/docker-image.yml exists
@@ -25,10 +23,10 @@ updated: 2026-09-28
 - ✅ docker-volume-rbd/.dockerignore exists
 - ✅ docker-volume-rbd/build.sh exists
 - ✅ docker-volume-rbd/README.md exists
-- ✅ docker-volume-rbd/package.json test script as specified exists
-- ✅ docker-volume-rbd/src/*.test.ts exists
-- ✅ docker-volume-rbd/.github/skills/setup-node exists
-- ❌ docker-volume-rbd/VERSION (to be added) does not exist
+- ❌ docker-volume-rbd/VERSION (new file) does not exist
+- ✅ package.json test script matching the prerequisite exists
+- ✅ src/*.test.ts exists
+- ✅ .github/skills/setup-node exists
 
 ## Recommendation
-The requested files and test prerequisite are present, and the work is cohesive. Add a non-canceling concurrency requirement for master publishing and resolve the pull-request write-permission risk before dispatch.
+Clarify whether skipping a queued master release is acceptable. If every master push must publish, specify a queueing approach that preserves every publish run; otherwise document the concurrency limitation. The remaining scope and file references are feasible.
