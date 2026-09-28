@@ -15,19 +15,23 @@ updated: 2026-09-28
 
 ## Issues
 
-### [MAJOR] The prerequisites have not landed in the checked-out docker-volume-rbd code: src/app.ts and src/*.test.ts are absent, handlers and mountPointTable remain in src/server.ts, Rbd has no injectable runner, and package.json has no test script. Do not dispatch this goal until both named prerequisites are merged and their resulting structure is verified.
+### [MAJOR] The stated prerequisites have not landed in the checked-out repository. src/app.ts and src/*.test.ts do not exist, server.ts still owns the routes and mountPointTable, Rbd has no injectable runner, and package.json has no test script. Do not dispatch until both prerequisite goals are verified as landed.
 
-### [MINOR] The recovery tests should cover a device mounted at the wrong path, not just mapped-but-unmounted images. Recovery must match both the mapped device and the expected mountpoint to avoid treating an unrelated mount as this volume.
+### [MAJOR] Recovery depends on old mounts appearing in the restarted plugin's /proc/mounts. config.json declares /mnt/volumes as a propagated mount, but the goal does not establish that those mounts remain visible in a new plugin mount namespace. Validate this restart behavior; otherwise recovery may silently find no entries.
+
+### [MINOR] src/config.ts is listed as a file not to change, but it does not exist in this repository.
 
 ## Verified
-- ❌ docker-volume-rbd/src/app.ts does not exist
-- ✅ docker-volume-rbd/src/server.ts and mountPointTable exists
-- ✅ docker-volume-rbd/src/server.ts getMountPoint exists
-- ✅ docker-volume-rbd/src/rbd.ts Rbd.isMapped exists
-- ❌ docker-volume-rbd/src/rbd.ts Rbd.listMapped does not exist
-- ✅ docker-volume-rbd/src/mountPointEntry.ts MountPointEntry.references and hasReference exists
-- ❌ docker-volume-rbd/src/*.test.ts does not exist
-- ❌ docker-volume-rbd/package.json test script does not exist
+- ✅ src/server.ts exists
+- ✅ src/rbd.ts and Rbd.isMapped() exists
+- ✅ src/mountPointEntry.ts and MountPointEntry.hasReference() exists
+- ✅ mountPointTable and getMountPoint() in src/server.ts exists
+- ✅ Unknown volume and Unknown caller id responses exists
+- ❌ src/app.ts and createApp() does not exist
+- ❌ Rbd.listMapped() does not exist
+- ❌ src/*.test.ts does not exist
+- ❌ package.json test script does not exist
+- ❌ src/config.ts does not exist
 
 ## Recommendation
-Keep the prerequisite ordering, but block dispatch until both prerequisite goals land. Then recheck the stated API and test setup, and add a wrong-mountpoint recovery test. The proposed implementation scope is otherwise reasonable.
+Keep the goal gated on both prerequisites. Verify the post-prerequisite structure and that mounts survive visibly across a real plugin restart before dispatching; remove the nonexistent file from the exclusion list.
