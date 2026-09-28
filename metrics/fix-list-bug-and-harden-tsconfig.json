@@ -1,7 +1,7 @@
 {
-  "iteration": 5,
-  "timestamp": "2026-09-28T12:21:53.8944017Z",
-  "duration": "00:08:43.5234988",
+  "iteration": 6,
+  "timestamp": "2026-09-28T15:55:36.2900531Z",
+  "duration": "03:35:13.1176675",
   "buildSuccess": false,
   "totalTests": 0,
   "passedTests": 0,
@@ -13,7 +13,7 @@
   "verdict": "Fail",
   "testReportSummary": "",
   "issues": [
-    "Worker (docwriter) completed without calling its mandatory report tool. This usually indicates API errors, timeouts, or the worker hallucinating tool calls as text."
+    "Worker (coder) completed without calling its mandatory report tool. This usually indicates API errors, timeouts, or the worker hallucinating tool calls as text."
   ],
   "reviewIssuesFound": 0,
   "reviewIssues": [],
