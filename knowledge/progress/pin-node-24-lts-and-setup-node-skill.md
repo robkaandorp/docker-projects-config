@@ -43,3 +43,7 @@ I wrote install-node.sh first. My first version used `node` inside the version p
 ### tester (narrative)
 
 Verified the Node 24 LTS pin and setup-node skill end-to-end. I used the skill itself to bootstrap the toolchain from a clean state: the script installed Node v24.21.0 with SHASUMS256 verification engaging on stderr, printed only the bin path on stdout, and was idempotent on rerun (0.117s, no download); Corepack resolved pnpm 12.4.2 as pinned. Frozen-lockfile install and the strict tsc build both succeeded on Node 24, and git status stayed clean with the install dir outside the repo. I also exercised the NODE_INSTALL_DIR variant and the non-integer .node-version error path. Docker was unavailable, so the Dockerfile change was verified by inspection (COPY placement and setup_24.x expansion simulated). No test framework was added since the repo has none and the acceptance criteria are runtime/environment behaviors covered by my verification runs.
+
+### reviewer (narrative)
+
+I compared the six changed files with the authoritative goal, inspected the installer line by line, and used the tester's 12 passing functional checks for runtime verification. The Dockerfile, lockfile, skill documentation, and clean-state behavior match the requested change. A targeted inspection of version parsing found that removing all whitespace before validation makes an internally spaced, non-integer major appear valid, which the existing validation tests did not cover.
