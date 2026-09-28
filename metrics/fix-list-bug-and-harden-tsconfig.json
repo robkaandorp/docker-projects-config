@@ -1,0 +1,38 @@
+{
+  "iteration": 5,
+  "timestamp": "2026-09-28T12:21:53.8944017Z",
+  "duration": "00:08:43.5234988",
+  "buildSuccess": false,
+  "totalTests": 0,
+  "passedTests": 0,
+  "failedTests": 0,
+  "coveragePercent": 0,
+  "integrationTestsTotal": 0,
+  "integrationTestsPassed": 0,
+  "runtimeVerified": false,
+  "verdict": "Fail",
+  "testReportSummary": "",
+  "issues": [
+    "Worker (docwriter) completed without calling its mandatory report tool. This usually indicates API errors, timeouts, or the worker hallucinating tool calls as text."
+  ],
+  "reviewIssuesFound": 0,
+  "reviewIssues": [],
+  "reviewVerdict": null,
+  "retryCount": 5,
+  "reviewRetryCount": 0,
+  "testRetryCount": 5,
+  "phaseDurations": {},
+  "promptTokens": 0,
+  "completionTokens": 0,
+  "agentsMdVersions": {
+    "coder": "v000",
+    "tester": "v000",
+    "reviewer": "v000",
+    "improver": "v000",
+    "orchestrator": "v000",
+    "docwriter": "v000"
+  },
+  "custom": {},
+  "improverSkipped": false,
+  "improverSkipReason": null
+}
