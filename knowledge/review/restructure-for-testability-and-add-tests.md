@@ -11,21 +11,21 @@ updated: 2026-09-28
 
 # Review: restructure-for-testability-and-add-tests
 
-## Verdict: NeedsChanges
+## Verdict: Approved
 
 ## Issues
 
-### [CRITICAL] The prerequisite has not landed in the inspected docker-volume-rbd checkout. tsconfig.json does not enable strict mode or remove the DOM lib; server.ts defaults cluster/user to "ceph"/"admin"; Rbd does not pass --cluster or --id; and VolumeDriver.List uses Name: name rather than info.image. Dispatch only after fix-list-bug-and-harden-tsconfig is applied, so the requested no-behaviour-change baseline exists.
+No issues found.
 
 ## Verified
-- ✅ docker-volume-rbd/src/rbd.ts and Rbd methods create, map, unMap, list, remove, mount, unmount exists
-- ✅ docker-volume-rbd/src/server.ts and VolumeDriver routes exists
-- ✅ docker-volume-rbd/src/mountPointEntry.ts and MountPointEntry.hasReference exists
-- ✅ docker-volume-rbd/package.json, pnpm-lock.yaml, tsconfig.json, and entrypoint.sh exists
-- ❌ docker-volume-rbd/src/app.ts does not exist
-- ❌ docker-volume-rbd/src/config.ts does not exist
-- ❌ docker-volume-rbd/src/*.test.ts does not exist
-- ❌ Prerequisite strict tsconfig, unset cluster/user semantics, CLI flags, and List image-name fix does not exist
+- ✅ docker-volume-rbd/src/rbd.ts: Rbd and the specified CLI and filesystem calls exists
+- ✅ docker-volume-rbd/src/server.ts: configuration, routes, mountPointTable, and socket listener exists
+- ✅ Prerequisite semantics: strict tsconfig without DOM, List Name: info.image, unset cluster/user handling, and conditional --cluster/--id arguments exists
+- ✅ docker-volume-rbd/src/mountPointEntry.ts: MountPointEntry and hasReference exists
+- ✅ docker-volume-rbd/package.json: build script and dist/server.js main exists
+- ❌ docker-volume-rbd/src/app.ts (proposed new file) does not exist
+- ❌ docker-volume-rbd/src/config.ts (proposed new file) does not exist
+- ❌ docker-volume-rbd/src/*.test.ts (proposed new files) does not exist
 
 ## Recommendation
-Keep the goal and its dependency order, but wait for the prerequisite to land and verify its semantics before dispatch. The proposed refactor and test suite are otherwise appropriately scoped and testable.
+Proceed. The prerequisite is reflected in the current source, and the scope and acceptance criteria are appropriate for a focused testability refactor.
