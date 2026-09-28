@@ -109,7 +109,7 @@ models:
     reasoning_effort: high
     description: The senior architect. Deepest reasoning of the catalog — gets things right where other models get them wrong, especially architecture and complex coding. Slower and expensive as a result. Use for hard design/correctness problems, not for bulk work.
   - name: ollama-cloud/glm-5.3-flash
-    reasoning_effort: extra_high
+    reasoning_effort: high
     description: Excellent all-round model for analysis, orchestration and coding at low cost. Good trade-off between quality, speed and cost. This vision capable model supports images only, not PDF.
   - name: copilot/gemini-3.8-flash
     reasoning_effort: high
