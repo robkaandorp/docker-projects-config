@@ -1,0 +1,36 @@
+---
+title: Progress: handle-untracked-volumes-after-restart
+type: scratch
+status: draft
+author: composer
+tags: []
+links: []
+created: 2026-09-28
+updated: 2026-09-28
+---
+
+# Progress: handle-untracked-volumes-after-restart
+
+## Iteration 1
+
+### Brain Plan
+
+Phases: Coding → Testing → Review → Merging
+
+Reasoning: Clean first iteration with no prior feedback, so no Improve phase. The goal is a code change (src/app.ts, src/rbd.ts, src/*.test.ts) with explicit test requirements and no documentation request (README.md is on the NOT-to-change list), so a single Coding → Testing round followed by Review and Merging is sufficient; the change is well-specified and modest in size, so multiple coding rounds are unnecessary.
+
+**Coding**: Implement lazy handling of unknown-but-still-mapped/mounted volumes in docker-volume-rbd. Work on the feature branch; no startup recovery, no implicit reference counting, src/server.ts and src/config.ts must stay untouched.
+
+1) src/rbd.ts:
+- Extend the existing `FileSystem` type with `readFileSync(path: string, encoding: "utf8"): string`; the default stays the real `fs`. Do NOT add a separate reader parameter.
+- Add `Rbd.getMountedDevice(mountPoint: string): Promise<string | null>`: read /proc/mounts via `this.fileSystem.readFileSync`, split into lines, whitespace-split fields, field 1 = source device, field 2 = target; return the source of the entry whose target is EXACTLY `mountPoint` (string equality, no prefix matching — /mnt/volumes/rbd/foo must not match /mnt/volumes/rbd/foobar), or null when there is no entry.
+
+2) src/app.ts:
+- Add "getMountedDevice" to `RbdInterface`.
+- Unmount: remove the now-redundant second "Unknown volume" check (the `if (!mountPointEntry)` after the `get`); take the entry from a single `mountPointTable.get`. When there is NO entry, instead of returning "Unknown volume" do best-effort cleanup inside the existing `withVolumeLock`: (a) read `mappedDevice = rbd.isMapped(name)` and `mountedDevice = rbd.getMountedDevice(getMountPoint(name))`; (b) CONFLICT CHECK — if `mountedDevice` is non-null AND (`mappedDevice` is null OR `mountedDevice !== mappedDevice`), log and return an Err describing the conflict (mountpoint, found device, expected device) and change NOTHING (no unmount, no unmap); (c) otherwise if `mountedDevice` is non-null call `rbd.unmount(mountPoint)`; (d) then if `mappedDevice` is non-null call `rbd.unMap(name)`; (e) return `{ Err: "" }` on success, including when there was nothing to clean up; (f) if isMapped, getMountedDevice, unmount or unMap throws, return that error in `Err` as other handlers do. Log clearly that an untracked volume was cleaned up (e.g. "not tracked, probably mounted before a plugin restart"). Put a code comment on this untracked-Unmount logic stating the accepted trade-off: because references are not tracked across restarts, the first Unmount for an untracked volume cleans it up (unmount + unmap) even if another container on the same node started before the restart is still using it; the owner accepts this since rbd volumes are used by one container at a time in practice; volumes mounted AFTER the restart are tracked normally with full reference counting. Do NOT claim the README forbids this (it only warns against mounting on multiple hosts).
+- Mount: in the not-in-table branch, also call `rbd.getMountedDevice(mountPoint)` alongside `rbd.isMapped(name)`. If mapped and the mounted device equals the mapped device: adopt the existing mount — no map, no mount, create a normal table entry with req.ID, return the mountpoint (ownsMapping stays false, so this request's rollback must never unmount/unmap it). If a device is mounted at the mountpoint and it differs from the mapped device, OR the image is not mapped at all (while something is mounted): return an Err explaining the conflict and change nothing (no map, no mount, no unmap). If nothing is mounted at the mountpoint: continue with the existing map/mount logic including rollback.
+- Unchanged: Unmount for a KNOWN volume with an unknown caller ID still returns the "Unknown caller id" Err; refcounting for tracked volumes, tracked-volume success paths, API response shapes, and the rollback behaviour from the previous goal are unchanged.
+3) Update any existing test that expected "Unknown volume" for an untracked Unmount so it matches the new behaviour — do not delete coverage.
+4) When done, verify with the build and test skills (if node is missing, use the .github/skills/setup-node skill), then commit with `git add -A && git commit`. Do not touch files outside src/app.ts, src/rbd.ts, src/*.test.ts.
+**Testing**: Build and run the test suite with the build and test skills (if node is missing, use the .github/skills/setup-node skill). Verify the existing suite still passes and that the new coverage exists and passes: (a) rbd.test.ts — getMountedDevice with a fake readFileSync over multi-line /proc/mounts content: exact target match returns the device, no match returns null, no prefix match (/mnt/volumes/rbd/foo vs /mnt/volumes/rbd/foobar); (b) app.test.ts — Unmount of untracked volume: mounted with own mapped device => unmount + unMap, Err ""; not mounted but still mapped => no unmount, unMap called, Err ""; nothing mounted or mapped => no unmount, no unMap, Err ""; different device mounted than mapped => Err describing conflict, no unmount, no unMap; mounted but image not mapped => Err, no unmount, no unMap; umount fails => Err carries the error. Mount: untracked volume mapped and mounted with same device => no map, no mount, entry created, and a later Unmount with that ID unmounts and unmaps; different device mounted => Err, no map/mount/unMap; not mapped but something mounted => Err, no map/mount. Tracked volume with unknown caller ID still errs. Any updated "Unknown volume" test asserts the new behaviour. Call report_test_results with pass/fail details. If tests fail, report the exact failing test names and assertions.
+**Review**: Review the diff on the feature branch using the workspace diff context, focusing on +/- lines against the goal: getMountedDevice reading /proc/mounts through the injectable FileSystem with exact-target matching only; untracked-Unmount cleanup inside the volume lock with the conflict check (mounted non-null and (mapped null or different) => Err, change nothing), then unmount then unmap, Err "" when nothing to clean up, errors propagated in Err; the accepted-trade-off comment present and not claiming the README forbids shared use; Mount adoption (same device => entry, no map/mount), conflict Errs without map/mount/unMap, and no-adopt path preserving rollback; redundant second "Unknown volume" check removed; known-volume unknown-caller-ID Err and tracked-volume refcounting unchanged; src/server.ts, src/config.ts, mountPointEntry.ts, config.json, Dockerfile, .dockerignore, entrypoint.sh, build.sh, VERSION, README.md, package.json, pnpm-lock.yaml, .node-version, .github/skills/**, .github/workflows/docker-image.yml, .github/copilot-instructions.md NOT changed. Use the testing phase results to verify all tests pass. Call report_review_verdict.
