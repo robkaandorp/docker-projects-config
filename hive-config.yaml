@@ -24,13 +24,13 @@ workers:
     reasoning_effort: extra_high
     premium_reasoning_effort: high
   reviewer:
-    model: copilot/gpt-6-sol
+    model: copilot/gpt-6.1-sol
     premium_model: ''
     reasoning_effort: high
     premium_reasoning_effort: none
   tester:
     model: ollama-cloud/glm-5.3-flash
-    premium_model: copilot/gpt-6-sol
+    premium_model: copilot/gpt-6.1-sol
     reasoning_effort: high
     premium_reasoning_effort: high
   improver:
