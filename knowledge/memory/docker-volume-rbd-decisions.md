@@ -3,7 +3,7 @@ title: docker-volume-rbd: owner decisions and conventions
 type: memory
 status: active
 author: composer
-tags: [docker-volume-rbd, decisions, branching, ci]
+tags: [docker-volume-rbd, decisions, branching, ci, versioning, node]
 links: []
 created: 2026-09-28
 updated: 2026-09-29
@@ -11,59 +11,47 @@ updated: 2026-09-29
 
 # docker-volume-rbd: project decisions
 
-Things the owner (Rob Kaandorp) decided, to keep in mind when planning goals for `docker-volume-rbd`.
+Things the owner (Rob Kaandorp) decided, to keep in mind when planning goals for `docker-volume-rbd`. For how the code is actually built, see `implementation-docker-volume-rbd-architecture`.
 
 ## Usage context
 - The main user is the owner's own office Docker Swarm, so there are few users. Keep changes simple and lightweight. Don't over-engineer.
 
 ## Ceph version
-- The cluster and the swarm hosts run **Ceph Tentacle 20.2**. The Dockerfile installs ceph-common from the official download.ceph.com `debian-tentacle` repo for noble. This works on the hosts. The old Dockerfile comment about needing Squid 19.2 for kernel 5.10 is **out of date**.
-- **Exclusive locking is currently turned off** in production (`RBD_CONF_MAP_OPTIONS` set to empty), because the exclusive-lock feature isn't enabled on the rbd images yet. The code default is still `--exclusive`.
+- The cluster and the swarm hosts run **Ceph Tentacle 20.2**. The Dockerfile installs ceph-common from the official download.ceph.com `debian-tentacle` repo for noble.
+- **Exclusive locking is turned off in production** (`RBD_CONF_MAP_OPTIONS` set to empty) because the exclusive-lock feature isn't enabled on the rbd images yet. The code default is still `--exclusive`. Check this setting after every plugin upgrade.
 
 ## Branching and publishing
-- Development happens on a **`develop`** branch. Goals should target `develop`.
-- Publishing to Docker Hub (`docker plugin push robkaandorp/rbd:<tag>`) and creating the GitHub release must only happen on a **push to `master`**, i.e. after a release merge from develop to master. Develop and PR builds only build and test.
-- It is a Docker *managed plugin*, so it is published with `docker plugin push`, not `docker push`.
+- Development happens on **`develop`** (the GitHub default branch). Goals target `develop`.
+- Releases are develop → master merges. Only a **push to `master`** publishes, to Docker Hub and as a GitHub release; develop and PR builds only build and test.
+- It is a Docker *managed plugin*: it is published with `docker plugin create` / `push`, never `docker push`.
+- Docker Hub secrets `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` are configured (2026-09-28).
+
+## Versioning
+- A `VERSION` file at the repo root holds `v<ceph major>.<minor>-r<revision>`, e.g. `v20.2-r1`.
+- A release publishes `robkaandorp/rbd:<base>` (moving tag, e.g. `v20.2`, the one users install), `robkaandorp/rbd:<full>` (e.g. `v20.2-r1`), and a GitHub release + tag `<full>` on the built master commit.
+- **Bump the revision on develop before each release merge.** CI fails closed if that GitHub release or tag already exists.
+- A version counts as unreleased until its GitHub release exists. A rerun after a partial publish may overwrite the Docker Hub tags of that version; this is accepted (issue publish-guard-does-not-check-docker-hub-tags…, acknowledged).
+- CopilotHive release IDs use the same scheme. CopilotHive's own tag-on-merge option stays **disabled**; the workflow is the only tag owner.
+- This replaced the old `vars.VERSION_TAG` + `github.run_number` scheme (last old release: v20.2.26).
 
 ## Config options
-- `RBD_CONF_CLUSTER` / `RBD_CONF_KEYRING_USER`: **implement, fully backwards compatible**. Only pass `--cluster` / `--id` to rbd when the variable is explicitly set and non-empty. When unset, the command lines must be unchanged. The owner doesn't use them today.
+- `RBD_CONF_CLUSTER` / `RBD_CONF_KEYRING_USER`: `--cluster` / `--id` are passed only when the variable is set and non-empty, so command lines are unchanged when unset. The owner doesn't use them today.
+
+## Restart handling
+- There is deliberately no startup recovery of the mount table. Untracked volumes are handled lazily when Docker asks about them.
+- Accepted trade-off: after a restart, the first Unmount cleans the volume up even if another pre-restart container still uses it.
+- The owner verified this on the swarm in 2026-09.
+
+## Node.js version
+- The Node **major** is pinned in `.node-version` (currently `24`). The Dockerfile derives nodesource `setup_<major>.x` from it, and the `@types/node` major matches it.
+- Moving to the next LTS is a deliberate bump: `.node-version` + `@types/node` major + regenerating the lockfile with pnpm. Node 26 becomes LTS on 2026-10-28.
+- Node 25+ no longer bundles Corepack, so a bump to 26 needs `npm i -g corepack` (or equivalent) in the Dockerfile and `.github/skills/setup-node/install-node.sh`.
+- Worker images have no Node; workers use the `setup-node` repo skill.
 
 ## Testing
-- Use Node's built-in test runner (`node --test`), with no extra test framework. Restructure for testability: an injectable command runner in `Rbd`, and a `createApp()` factory split from the socket `listen` entry point.
+- Node's built-in test runner (`node:test`) only, no extra framework. Tests must not need Ceph, root or real binaries.
 
-
-
-## Versioning (decided 2026-09-28)
-- A `VERSION` file at the repo root holds `v<ceph major>.<minor>-r<revision>`, e.g. `v20.2-r1`.
-- Each master release publishes Docker Hub tags `robkaandorp/rbd:v20.2` (moving tag, the one users install) and `robkaandorp/rbd:v20.2-r1` (immutable), plus a GitHub release `v20.2-r1`.
-- Bump the revision on develop before each release merge. CI fails on master if that version was already released.
-- CopilotHive release IDs/tags follow the same scheme (first release: `v20.2-r1`). The owner turned off CopilotHive's automatic tagging on merge to master, because CI does the tagging.
-- This replaces the old `vars.VERSION_TAG` + `github.run_number` scheme (the last old release was v20.2.26).
-
-## Restart handling (decided 2026-09-28)
-- No startup recovery of the mount table. Untracked volumes are handled when Docker asks about them: Unmount of an untracked volume unmounts and unmaps it if its own device is mounted; Mount adopts an existing mount of the same device. A conflicting device at the mountpoint returns an Err and nothing is changed.
-
-
-
-## Tag ownership (decided 2026-09-28)
-- CopilotHive's "tag on release / merge to master" option stays **disabled** for docker-volume-rbd. The GitHub Actions workflow is the only thing that creates release tags: `gh release create "$FULL_VERSION" --target "${{ github.sha }}"` on push to master.
-- `--target` is required because GitHub's default branch is `develop`. Without it, `gh release create` would put a new tag on develop's HEAD.
-
-
-
-## Node.js version (decided 2026-09-28)
-- Pin the Node **major** in `.node-version` at the repo root (currently `24`, Krypton Active LTS). It's the single source of truth: the Dockerfile derives nodesource `setup_<major>.x` from it, and the `@types/node` major matches it.
-- No floating `setup_lts.x`. Moving to the next LTS (26 becomes LTS on 2026-10-28) is a deliberate bump: `.node-version` + `@types/node` major + regenerating the lockfile with pnpm.
-- Worker images don't have Node. The repo skill `.github/skills/setup-node/` (`install-node.sh`) installs the pinned major into /tmp with SHA-256 verification and enables Corepack pnpm. Note: Node 25+ no longer bundles Corepack, so a bump to 26 needs `npm i -g corepack` or an equivalent in the skill/Dockerfile.
-
-
-
-## Docker Hub secrets (2026-09-28)
-- The owner has configured the `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets for docker-volume-rbd. No further setup is needed for the master `publish` job.
-
-
-
-## CI publish job gotchas (learned during the v20.2-r1 release, 2026-09-29)
-- The master `publish` job deliberately has no `actions/checkout` (write token + no repo code). So every `gh` subcommand other than `gh api repos/...` needs `GH_REPO: ${{ github.repository }}` in its env; otherwise it fails with `failed to run git: fatal: not a git repository`.
-- One Docker daemon cannot `docker plugin create` twice from the same rootfs ("content sha256:…: already exists"). Push the plugin once as `<full>`, then retag on the registry with `docker buildx imagetools create --prefer-index=false` (the flag is required: without it buildx wraps the manifest in a list).
-- Workers can't run GitHub Actions or push to Docker Hub, so publish-path bugs only show up on a real master run. Review publish-step changes against real tool behaviour, not stubs.
+## CI publish job gotchas (learned during the v20.2-r1 release)
+- The master `publish` job deliberately has no `actions/checkout` (it holds a write token and runs no repo code). So every `gh` subcommand other than `gh api repos/...` needs `GH_REPO: ${{ github.repository }}`; otherwise it fails with `fatal: not a git repository`.
+- One Docker daemon cannot `docker plugin create` twice from the same rootfs ("content sha256:…: already exists"). Push once as `<full>`, then retag on the registry with `docker buildx imagetools create --prefer-index=false`. The flag is required: without it buildx wraps the manifest in a list.
+- Workers can't run GitHub Actions or push to Docker Hub, so publish-path bugs only surface on a real master run. Review publish-step changes against real tool behaviour, not stubs.
