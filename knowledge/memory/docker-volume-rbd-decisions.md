@@ -4,7 +4,10 @@ type: memory
 status: active
 author: composer
 tags: [docker-volume-rbd, decisions, branching, ci, versioning, node]
-links: []
+links:
+  - target: implementation-docker-volume-rbd-architecture
+    type: related
+    description: Architecture of what was built under these decisions
 created: 2026-09-28
 updated: 2026-09-29
 ---
