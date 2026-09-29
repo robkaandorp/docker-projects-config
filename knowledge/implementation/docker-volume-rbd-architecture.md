@@ -1,7 +1,7 @@
 ---
 title: docker-volume-rbd: architecture (as of v20.2-r1)
 type: implementation
-status: draft
+status: active
 author: composer
 tags: [docker-volume-rbd, architecture, ci, release-v20.2-r1]
 links:
