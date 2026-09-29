@@ -94,6 +94,7 @@ models:
     supports_vision: true
   - name: copilot/gpt-6.1-sol
     context_window: 400000
+    supports_vision: true
   sub_agent_models:
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
