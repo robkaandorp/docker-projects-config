@@ -6,7 +6,7 @@ author: composer
 tags: [docker-volume-rbd, decisions, branching, ci]
 links: []
 created: 2026-09-28
-updated: 2026-09-28
+updated: 2026-09-29
 ---
 
 # docker-volume-rbd: project decisions
@@ -60,3 +60,10 @@ Things the owner (Rob Kaandorp) decided, to keep in mind when planning goals for
 
 ## Docker Hub secrets (2026-09-28)
 - The owner has configured the `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets for docker-volume-rbd. No further setup is needed for the master `publish` job.
+
+
+
+## CI publish job gotchas (learned during the v20.2-r1 release, 2026-09-29)
+- The master `publish` job deliberately has no `actions/checkout` (write token + no repo code). So every `gh` subcommand other than `gh api repos/...` needs `GH_REPO: ${{ github.repository }}` in its env; otherwise it fails with `failed to run git: fatal: not a git repository`.
+- One Docker daemon cannot `docker plugin create` twice from the same rootfs ("content sha256:…: already exists"). Push the plugin once as `<full>`, then retag on the registry with `docker buildx imagetools create --prefer-index=false` (the flag is required: without it buildx wraps the manifest in a list).
+- Workers can't run GitHub Actions or push to Docker Hub, so publish-path bugs only show up on a real master run. Review publish-step changes against real tool behaviour, not stubs.
