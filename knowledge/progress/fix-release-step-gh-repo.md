@@ -30,3 +30,7 @@ The task was narrow and explicit: add `GH_REPO: ${{ github.repository }}` below 
 ### tester (narrative)
 
 This was a verification-only iteration on a single-line CI workflow change (GH_REPO env added to the gh release create step). I confirmed via git diff that only .github/workflows/docker-image.yml changed with no type-level impact, then ran the standard toolchain: the setup-node skill had to be used because node was not on PATH (it reused a cached Node 24 install, so setup was fast), a fresh frozen-lockfile pnpm install, tsc build, and the full node:test suite — all 108 tests passed on the first attempt with exit 0. No test authoring was needed since this is pure workflow YAML in scope-restricted code, and the working tree stayed clean, so there was nothing to commit before reporting. The only mild friction was remembering that PATH updates don't persist between shell calls, so I re-exported the node bin dir in every command that needed it.
+
+### reviewer (narrative)
+
+I compared the merge-base diff and found exactly one added GH_REPO entry in the release step's env block, then read the workflow to confirm placement, indentation, unchanged command, and checkout-free publish job. I reviewed the independent tester report showing a successful build and all 108 tests passing. PyYAML was not available locally, so I checked the single-line YAML edit by inspection; there were no other changed files or behavioral changes to assess.
