@@ -120,6 +120,9 @@ models:
   - name: copilot/gemini-3.8-flash
     reasoning_effort: high
     description: Fast and cheap, but still very capable. Supports all modalities; text, image, speech and video.
+  - name: copilot/gpt-6.1-sol
+    reasoning_effort: high
+    description: Heavy model at a reasonable price. Excellent for deep reviews.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
