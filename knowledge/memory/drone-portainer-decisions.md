@@ -1,7 +1,7 @@
 ---
 title: drone-portainer: owner decisions and conventions
 type: memory
-status: draft
+status: active
 author: composer
 tags: [drone-portainer, decisions, versioning, ci]
 links:
