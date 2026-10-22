@@ -126,6 +126,9 @@ models:
   - name: copilot/claude-sonnet-5.5
     reasoning_effort: high
     description: One of the best all-round models. Reasonably smart, somewhat expensive. Supports vision; images and PDF.
+  - name: ollama-cloud/deepseek-v4.1-flash:1017
+    reasoning_effort: extra_high
+    description: Default coding model. Good trade-off between cost and speed. This vision capable model supports images only, not PDF.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
