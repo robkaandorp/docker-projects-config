@@ -21,7 +21,7 @@ repositories:
   ci_timeout_minutes: 30
 workers:
   coder:
-    model: ollama-cloud/deepseek-v4.1-flash
+    model: ollama-cloud/deepseek-v4.1-flash:1017
     premium_model: copilot/claude-sonnet-5.5
     reasoning_effort: extra_high
     premium_reasoning_effort: high
