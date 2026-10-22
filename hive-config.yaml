@@ -126,6 +126,9 @@ models:
   - name: copilot/gpt-6.1-sol
     reasoning_effort: high
     description: Heavy model at a reasonable price. Excellent for deep reviews.
+  - name: copilot/claude-sonnet-5.5
+    reasoning_effort: high
+    description: One of the best all-round models. Reasonably smart, somewhat expensive. Supports vision; images and PDF.
 composer:
   model: copilot/claude-opus-5.5
   max_steps: 100
