@@ -1,0 +1,41 @@
+{
+  "iteration": 1,
+  "timestamp": "2026-10-22T16:02:55.772583Z",
+  "duration": "00:19:45.5430003",
+  "buildSuccess": true,
+  "totalTests": 77,
+  "passedTests": 77,
+  "failedTests": 0,
+  "coveragePercent": 0,
+  "integrationTestsTotal": 0,
+  "integrationTestsPassed": 0,
+  "runtimeVerified": false,
+  "verdict": "Pass",
+  "testReportSummary": "",
+  "issues": [
+    "Minor (low): the version regex ^[0-9]\u002B\\.[0-9]\u002B\\.[0-9]\u002B$ accepts leading zeros (verified: \u002701.0.0\u0027 was ACCEPTED, exit 0), so a tag like v01.0.0 could be published. This matches the regex the goal explicitly prescribed, so it is not an acceptance-criteria deviation; suggested hardening is (0|[1-9][0-9]*)\\. for each numeric identifier.",
+    "Minor (low, cosmetic): in README.md the new sentence \u0027You can pin the plugin image to robkaandorp/drone-portainer:v1.0.0 ...\u0027 sits between \u0027...deploy a compose file to portainer. For example:\u0027 and its YAML example block, so the \u0027For example:\u0027 sentence reads as introducing the pinning sentence. The goal only required the sentence be added.",
+    "Environment note (not a code defect): git in this container could not resolve the 40-char merge-base SHA 210195919b242e976cf6844c65467d1ccb69 (0/30 attempts) even though the object is present in the pack index, \u0027git fsck --full --strict\u0027 passes, \u0027git rev-list --all\u0027 lists it, and the 39-char and 7-char short forms resolve fine. Verified the repository is intact; used the equivalent short SHA 2101959 for diff-based checks.",
+    "Test-harness note (not a code defect): \u0027gh release create\u0027 has no --dry-run flag, so one probe of the release command actually created a real release and tag v0.0.0-test on the remote. This was detected and immediately cleaned up (gh release delete \u002B DELETE git/refs/tags); re-verified via the API that the remote has zero releases and zero tags, and the guard still passes for v1.0.0."
+  ],
+  "reviewIssuesFound": 0,
+  "reviewIssues": [],
+  "reviewVerdict": "Approve",
+  "retryCount": 0,
+  "reviewRetryCount": 0,
+  "testRetryCount": 0,
+  "phaseDurations": {},
+  "promptTokens": 0,
+  "completionTokens": 0,
+  "agentsMdVersions": {
+    "coder": "v000",
+    "tester": "v000",
+    "reviewer": "v000",
+    "improver": "v000",
+    "orchestrator": "v000",
+    "docwriter": "v000"
+  },
+  "custom": {},
+  "improverSkipped": false,
+  "improverSkipReason": null
+}
