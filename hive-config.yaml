@@ -14,7 +14,6 @@ repositories:
   ci_timeout_minutes: 30
   release:
     merge_to: master
-    tag_branch: master
 - name: docker-volume-nfs
   url: https://github.com/robkaandorp/docker-volume-nfs.git
   default_branch: master
