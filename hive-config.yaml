@@ -99,6 +99,8 @@ models:
     context_window: 1048576
     supports_vision: true
   - name: ollama-cloud/minimax-m3.1-flash
+    context_window: 1000000
+    supports_vision: true
   sub_agent_models:
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
