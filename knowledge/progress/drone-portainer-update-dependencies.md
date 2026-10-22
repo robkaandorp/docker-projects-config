@@ -1,0 +1,46 @@
+---
+title: Progress: drone-portainer-update-dependencies
+type: scratch
+status: draft
+author: composer
+tags: []
+links: []
+created: 2026-10-22
+updated: 2026-10-22
+---
+
+# Progress: drone-portainer-update-dependencies
+
+## Iteration 1
+
+### Brain Plan
+
+Phases: Coding → Testing → Review → Merging
+
+Reasoning: First clean iteration of a well-scoped dependency/bugfix goal: three coordinated edits in package.json (axios security bump, TypeScript 7, packageManager via Corepack, main entry fix), lockfile regeneration with pnpm 12.15.0, Dockerfile base-image pinning in both stages with a possible install-command swap, and conditional-only changes to tsconfig.json/src/index.ts. The work is small and tightly coupled (lockfile must match package.json), so one coding round suffices. No documentation phase — the goal explicitly assigns README/changelog to a separate release-metadata goal. No improve phase — this is a clean first iteration with no prior feedback. Testing validates the acceptance criteria (frozen-lockfile install, TS7 build producing dist/index.js, node --check, CommonJS require of axios, pnpm audit, lts-alpine grep), then review and merging.
+
+**Coding**: Repository: drone-portainer (repo root is drone-portainer/, e.g. drone-portainer/package.json). Read package.json, Dockerfile, tsconfig.json and src/index.ts before editing.
+
+Step 0 — preflight: verify the target releases exist before touching anything: `npm view axios@1.20.0 version`, `npm view typescript@7.0.2 version bin`, `npm view pnpm@12.15.0 version`, `npm view @types/node@24 version`. Optionally run `pnpm audit --prod` on the current lockfile to confirm the axios advisory range. If any specified release is unavailable or the npm registry is unreachable, STOP and report a blocker — do NOT substitute other major versions and never fabricate integrity hashes.
+
+1) package.json (change ONLY these fields):
+- `main`: `dist/server.js` -> `dist/index.js`
+- `dependencies.axios`: `^1.17.0` -> `^1.20.0`
+- `devDependencies.typescript`: `^6.0.3` -> `^7.0.2`
+- `devDependencies.@types/node`: stay on major 24, use latest 24.x (>= `^24.19.2`). Do NOT move to 25/26.
+- `packageManager`: update to pnpm 12.15.0. Generate the field with Corepack (e.g. `corepack use pnpm@12.15.0`) so the sha512 integrity hash is correct — never hand-write the hash.
+- `version` stays `1.0.0`; do not change any other field.
+
+2) pnpm-lock.yaml: regenerate with pnpm 12.15.0 so it matches the new package.json. Do not hand-edit the lockfile.
+
+3) Dockerfile (both stages): replace `node:lts-alpine` with `node:24-alpine`. The install line is `RUN pnpm ci` (line 7): verify whether pnpm 12.15.0 supports `pnpm ci` as a frozen-lockfile clean install (`pnpm help ci` or docs). If yes leave the line; if not, replace with `RUN pnpm install --frozen-lockfile`. Leave every other line unchanged (COPY/WORKDIR/rm/corepack/build/prune/CMD `node /app/dist/index.js`).
+
+4) tsconfig.json: change ONLY if TypeScript 7 requires it to compile. If changed, keep `module: nodenext`, `rootDir ./src`, `outDir ./dist`, `types: ["node"]`, and CommonJS output (dist/index.js must still run via `node /app/dist/index.js`).
+
+5) src/index.ts: change ONLY if the new axios 1.20.0 / TypeScript 7 types force a compile fix. No behavioural changes.
+
+Do NOT change: .github/workflows/docker-image.yml, README.md, .github/copilot-instructions.md, .dockerignore, .gitignore.
+
+Self-check before committing: `pnpm install --frozen-lockfile` succeeds with pnpm 12.15.0; `pnpm run build` succeeds and produces dist/index.js which matches the new `main`; `node --check dist/index.js` passes; the compiled output requires axios via `require("axios")` (CommonJS); `pnpm audit --prod` reports no known vulnerabilities (if one remains in a transitive dep with no fixed release, note it for the summary — do NOT add pnpm overrides). If docker is available run `docker build .`; otherwise note that in the summary. Then commit with git add -A && git commit and call report_code_changes.
+**Testing**: Build and verify in drone-portainer: run `pnpm install --frozen-lockfile` with pnpm 12.15.0 (clean state first), `pnpm run build` with TypeScript 7, then verify: (1) dist/index.js exists and matches package.json `main`; (2) `node --check dist/index.js` passes; (3) the compiled output loads axios via `require("axios")` i.e. CommonJS; (4) `pnpm audit --prod` reports no known vulnerabilities (document any remaining unfixed transitive advisory instead of adding overrides); (5) grep the Dockerfile for `lts-alpine` — zero matches, both stages pin node:24-alpine, and the install command is one pnpm 12.15.0 actually supports; (6) docker build if docker is available, otherwise state unavailability. This repo has no test suite and none is required — this phase is validation of the acceptance criteria. Report findings via report_test_results.
+**Review**: Review in the drone-portainer repository. Focus on the workspace diff (+/- lines): package.json field changes must be exactly main -> dist/index.js, axios ^1.20.0, typescript ^7.0.2, @types/node major 24, and a Corepack-generated packageManager hash (verify the sha512 matches what `corepack use pnpm@12.15.0` produces — a hand-written/truncated hash is a defect); version must remain 1.0.0; no other fields changed. pnpm-lock.yaml must be regenerated by pnpm 12.15.0 (lockfileVersion consistent with pnpm 12) and not hand-edited. Dockerfile: both stages node:24-alpine, install line valid for pnpm 12.15.0, everything else byte-identical. tsconfig.json / src/index.ts only changed if genuinely required to compile, with no behavioural changes. Strict exclusions: .github/workflows/docker-image.yml, README.md, .github/copilot-instructions.md, .dockerignore, .gitignore must be untouched. Use the testing phase results to verify build/audit checks pass — do not reject because you cannot run tests yourself. Call report_review_verdict.
