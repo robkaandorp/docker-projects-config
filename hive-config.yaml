@@ -96,6 +96,7 @@ models:
     context_window: 400000
     supports_vision: true
   - name: ollama-cloud/deepseek-v4.1-flash:1017
+  - name: ollama-cloud/minimax-m3.1-flash
   sub_agent_models:
   - name: ollama-cloud/kimi-k3
     reasoning_effort: high
