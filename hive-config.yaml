@@ -20,7 +20,7 @@ repositories:
 workers:
   coder:
     model: ollama-cloud/deepseek-v4.1-flash
-    premium_model: copilot/claude-opus-5.5
+    premium_model: copilot/claude-sonnet-5.5
     reasoning_effort: extra_high
     premium_reasoning_effort: high
   reviewer:
@@ -29,12 +29,12 @@ workers:
     reasoning_effort: high
     premium_reasoning_effort: none
   tester:
-    model: ollama-cloud/glm-5.3-flash
+    model: ollama-cloud/minimax-m3.1-flash
     premium_model: copilot/gpt-6.1-sol
     reasoning_effort: high
     premium_reasoning_effort: high
   improver:
-    model: copilot/gpt-6-luna
+    model: ollama-cloud/glm-5.3-flash
     premium_model: ''
     reasoning_effort: high
     premium_reasoning_effort: none
